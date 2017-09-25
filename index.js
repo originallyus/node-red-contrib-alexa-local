@@ -4,6 +4,7 @@ module.exports = function(RED) {
         var node = this;
         var deviceName = config.devicename;
         var dimmable = config.dimmable;
+        node.warn("id: " + config.id);
         node.warn("deviceName: " + deviceName);
         node.warn("dimmable: " + dimmable);
 

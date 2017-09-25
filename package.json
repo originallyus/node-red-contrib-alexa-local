@@ -7,7 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "alexa", "node-red", "phillips", "hue", "emulator"
+    "alexa",
+    "node-red",
+    "phillips",
+    "hue",
+    "emulator"
   ],
   "author": "Torin Nguyen <torinnguyen@gmail.com>",
   "license": "ISC",
