@@ -40,4 +40,4 @@ Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.origin
 ## TODO
   * Alexa isolation
   * More convenient output variables (?)
-  * 
+  * Support RGB colors
