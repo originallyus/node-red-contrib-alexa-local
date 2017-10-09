@@ -5,6 +5,8 @@ This is a dead-simple node for adding Alexa capability to your NodeRED flow.
 
 **NO account linking required.**
 
+**NO complicated parameters, it just works.**
+
 Developed by the super cool forks at [Originally US](http://originally.us)
 
 ## How to use
