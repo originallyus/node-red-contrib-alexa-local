@@ -1,39 +1,61 @@
 module.exports = function(RED) 
 {
     //variables placed here are shared by all nodes
-    //var dimmable = false;
+    var storage = require('node-persist');
 
-    function AlexaLocalNode(config) {
+    function AlexaLocalNode(config) 
+    {
         RED.nodes.createNode(this, config);
         var thisNode = this;
 
-        //Restore saved port number, if any
+        //Initialize persist storage
+        storage.initSync({dir: 'nodered/alexa-local/persist'});
 
-        //HTTP Server to host the Hue API (any port)
+        //Restore saved port number, if any
+        //port == 0 when not available -> any available port (first time)
+        var lightId = formatUUID(config.id);
+        var port = getPortForUUID(lightId);
+
+        //HTTP Server to host the Hue API
         var http = require('http');
         var httpServer = http.createServer(function(request, response){
             handleHueApiRequestFunction(request, response, thisNode, config);
         });
-        httpServer.listen(0, function(error) {
+        httpServer.listen(port, function(error) {
             if (error) {
                 thisNode.status({fill:"red", shape:"ring", text:"unable to start"});
                 console.error(error);
                 return;
             }
 
-            var deviceName = "";
-            if (config.devicename)
-                deviceName = config.devicename;
+            //Extract the actual port number that was used
+            var actualPort = httpServer.address().port;
 
-            var port = httpServer.address().port;
-            config.port = port;
-            thisNode.status({fill:"green", shape:"dot", text:"online (p:" + port + ")"});
-            console.log("[Alexa] " + deviceName + " is served on port %s", port);
+            //Persist the port number attached to this NodeID
+            setPortForUUID(lightId, actualPort);
+
+            config.port = actualPort;
+            thisNode.status({fill:"green", shape:"dot", text:"online (p:" + actualPort + ")"});
 
             //Start discovery service after we know the port number            
-            startSSDP(thisNode, port, config);
+            startSSDP(thisNode, actualPort, config);
         });
     }
+
+    //NodeRED registration
+    RED.nodes.registerType("alexa-local", AlexaLocalNode, {
+      settings: {
+          alexaLocalAlexaDeviceName: {
+              value: "Light",
+              exportable: true
+          }
+      }
+    });
+
+
+    // -----------------------------------------------------------------------------------------------
+    // SSDP Discovery service
+    // -----------------------------------------------------------------------------------------------
 
     //Start SSDP discovery service with the port discovered by HTTP server
     function startSSDP(thisNode, port, config)
@@ -52,9 +74,7 @@ module.exports = function(RED)
         peer.on("notify", function(headers, address){
         });
         peer.on("search", function(headers, address){
-            //console.log("SEARCH:");
-            //console.log(headers);
-            //console.log(address);
+            //console.log("SEARCH: ", headers, address);
             var isValid = headers.ST && headers.MAN=='"ssdp:discover"';
             if (!isValid)
                 return;
@@ -70,13 +90,16 @@ module.exports = function(RED)
             }, address);
         });
         peer.on("found",function(headers, address){
-            console.log("FOUND:", headers);
         });
         peer.on("close",function(){
-            console.log("CLOSING.");
         });
         peer.start();
     }
+
+
+    // -----------------------------------------------------------------------------------------------
+    // XML
+    // -----------------------------------------------------------------------------------------------
 
     function constructAllLightsConfig(lightId, deviceName, httpPort)
     {
@@ -104,58 +127,17 @@ module.exports = function(RED)
         return rawXml;
     }
 
-    function handleAlexaDeviceRequestFunction(request, response, thisNode, config, uuid)
-    {
-        //Sanity check
-        if (request === null || request === undefined || request.data === null || request.data === undefined) {
-            thisNode.status({fill:"red", shape:"dot", text:"Invalid request (p:" + httpPort + ")"});
-            return;
-        }
 
-        //Node parameters
-        var lightId = ("" + config.id).replace(".", "");
-        var deviceName = "";
-        if (config.devicename)
-            deviceName = config.devicename;
-        var httpPort = 8082;
-        if (config.port && config.port > 0)
-            httpPort = config.port;
-
-        //Use the json from Alexa as the base for our msg
-        var msg = request.data;
-
-        //Add extra 'payload' parameter which if either "on" or "off"
-        var onoff = "off";
-        if (request.data.on)
-            onoff = "on";
-        msg.payload = onoff;
-
-        //Massage brightness parameter
-        if (msg.bri) {
-            msg.bri_normalized = msg.bri / 255.0;
-            msg.bri = msg.bri / 255.0 * 100.0;
-        } else {
-            msg.bri = (onoff == "on") ? 100.0 : 0.0;
-            msg.bri_normalized = (onoff == "on") ? 1.0 : 0.0;
-        }
-
-        //Send the message to next node
-        thisNode.send(msg);
-
-        //Response to Alexa
-        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":' + request.data.on + '}}]';
-        console.log("Sending response to " + request.connection.remoteAddress, responseStr);
-        thisNode.status({fill:"blue", shape:"dot", text:"" + onoff + " (p:" + httpPort + ")"});
-        response.writeHead(200, "OK", {'Content-Type': 'application/json'});
-        response.end(responseStr);
-    }
+    // -----------------------------------------------------------------------------------------------
+    // Handle HTTP Request / Hue API
+    // -----------------------------------------------------------------------------------------------
 
     function handleHueApiRequestFunction(request, response, thisNode, config)
     {
-        console.log(request.method, request.url, request.connection.remoteAddress);
+        //console.log(request.method, request.url, request.connection.remoteAddress);
 
         //Node parameters
-        var lightId = ("" + config.id).replace(".", "");
+        var lightId = formatUUID(config.id);
         var deviceName = "";
         if (config.devicename)
             deviceName = config.devicename;
@@ -214,13 +196,94 @@ module.exports = function(RED)
         }
     }
 
-    //NodeRED registration
-    RED.nodes.registerType("alexa-local", AlexaLocalNode, {
-      settings: {
-          alexaLocalAlexaDeviceName: {
-              value: "Light",
-              exportable: true
-          }
-      }
-    });
+    // -----------------------------------------------------------------------------------------------
+    // Handle HTTP Request / Alexa
+    // -----------------------------------------------------------------------------------------------
+
+    function handleAlexaDeviceRequestFunction(request, response, thisNode, config, uuid)
+    {
+        //Sanity check
+        if (request === null || request === undefined || request.data === null || request.data === undefined) {
+            thisNode.status({fill:"red", shape:"dot", text:"Invalid request (p:" + httpPort + ")"});
+            return;
+        }
+
+        //Node parameters
+        var lightId = formatUUID(config.id);
+        var deviceName = "";
+        if (config.devicename)
+            deviceName = config.devicename;
+        var httpPort = 8082;
+        if (config.port && config.port > 0)
+            httpPort = config.port;
+
+        //Use the json from Alexa as the base for our msg
+        var msg = request.data;
+
+        //Add extra 'payload' parameter which if either "on" or "off"
+        var onoff = "off";
+        if (request.data.on)
+            onoff = "on";
+        msg.payload = onoff;
+
+        //Massage brightness parameter
+        if (msg.bri) {
+            msg.bri_normalized = msg.bri / 255.0;
+            msg.bri = msg.bri / 255.0 * 100.0;
+        } else {
+            msg.bri = (onoff == "on") ? 100.0 : 0.0;
+            msg.bri_normalized = (onoff == "on") ? 1.0 : 0.0;
+        }
+
+        //Send the message to next node
+        thisNode.send(msg);
+
+        //Response to Alexa
+        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":' + request.data.on + '}}]';
+        console.log("Sending response to " + request.connection.remoteAddress, responseStr);
+        thisNode.status({fill:"blue", shape:"dot", text:"" + onoff + " (p:" + httpPort + ")"});
+        response.writeHead(200, "OK", {'Content-Type': 'application/json'});
+        response.end(responseStr);
+    }
+
+
+    // -----------------------------------------------------------------------------------------------
+    // Persistent helper
+    // -----------------------------------------------------------------------------------------------
+
+    /*
+     * We use NodeRED's Node ID as the UUID for Alexa device, with some tweaking
+     */
+    function formatUUID(lightId) 
+    {
+        var string = ("" + lightId);
+        return string.replace(".", "").trim();
+    }
+
+    /*
+     * Retrieve the port number used by a given NodeId from persistent storage
+     */
+    function getPortForUUID(lightId) 
+    {
+        if (storage == null)
+            return 0;
+
+        var key = formatUUID(lightId);
+        var port = storage.getItemSync(key);
+        if (port === null)
+            return 0;
+
+        return port;
+    }
+
+    /*
+     * Save the port number used by a given NodeId to persistent storage
+     */
+    function setPortForUUID(lightId, port) 
+    {
+        var key = formatUUID(lightId);
+        if (storage)
+            storage.setItemSync(key, port);
+    }
+
 }
