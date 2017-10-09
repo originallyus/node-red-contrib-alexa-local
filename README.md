@@ -1,4 +1,5 @@
-# node-red-contrib-alexa-local
+![Usage screenshot](https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot2.png "Screenshot")
+
 This is a dead-simple node for adding Alexa capability to your NodeRED flow.
 
 **NO Alexa Skills required.**
@@ -14,8 +15,6 @@ Developed by the super cool forks at [Originally US](http://originally.us)
   * Give it a unique **Device Name**
   * Ask "Alexa, discover devices"
   * That's it!
-
-![Usage screenshot](https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot2.png "Screenshot")
 
 ![Usage screenshot](https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot3.png "Screenshot")
 
