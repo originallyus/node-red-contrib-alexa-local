@@ -31,15 +31,37 @@
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-tips">This is simply the name of your node, it is not seen by Alexa.</div>
+
     <div class="form-row">
         <label for="node-input-devicename"><i class="icon-tag"></i> Device Name</label>
         <input type="text" id="node-input-devicename" placeholder="Ceiling light">
     </div>
-    <div class="form-tips">Alexa uses this Device Name to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
+    <div class="form-tips">Alexa uses this <b>Device Name</b> to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
 </script>
 
 <script type="text/x-red" data-help-name="alexa-local">
-    <p>Note that this Node ID is used to uniquely identify & persist each device seen by Alexa or Google Home. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app.</p>
+    <p>This is a dead-simple node for adding Alexa capability to your flow.
+      <br/>
+      <b>NO extra Alexa Skills required.</b>
+      <br/>
+      <b>NO account linking required.</b>
+    </p>
+
+    <h3>How to use</h3>
+    <ul> 
+      <li>Add this node to your flow</li>
+      <li>Give it a unique <b>Device Name</b></li>
+      <li>Ask "Alexa, discover devices"</li>
+      <li>That's it!</li>
+    </ul>
+
+    <p><a href="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot.png" target="_blank"><img src="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot.png"></a></p>
+
+    <p>
+        Developed by the cool forks at <a href="http://originally.us" target="_blank"><b>Originally US</b></a>
+    <p/>
+
     <h3>Outputs</h3>
     <dl class="message-properties">
         <dt>payload
@@ -62,4 +84,19 @@
              When dimming command is not used, this parameter will be 0.0 for "off" and 1.0 for "on" command.
         </dd>
     </dl>
+
+    <h3>Notes</h3>
+    <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of Device Name is ok, but you would also need to re-discover devices again.</p>
+
+    <h3>FAQ</h3>
+    <p><b>Does is support German or other language?</b>
+      <br/>We don't know. Please let us know if you have the answer <a href="mailto:hello@originally.us">hello@originally.us</a>
+    </p>
+    <p><b>Do I need to enable any Alexa Skils?</b>
+      <br/>No. Nah. Non. Nein.
+    </p>
+    <p><b>I have some suggestion, how do I contact you?</b>
+      <br/>Please drop us an email, or create an issue in our <a href="https://github.com/originallyus/node-red-contrib-alexa-local/issues" target="_blank">Github</a>
+    </p>
+
 </script>
