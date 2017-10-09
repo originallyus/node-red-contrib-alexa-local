@@ -63,6 +63,7 @@
     <p/>
 
     <h3>Outputs</h3>
+    
     <dl class="message-properties">
         <dt>payload
             <span class="property-type">string | on/off</span>
@@ -78,7 +79,7 @@
              When dimming command is not used, this parameter will be 0.0 for "off" and 100.0 for "on" command.
         </dd>
         <dt>bri_normalized<span class="property-type">float | 0.0-1.0</span></dt>
-        <dd> supports for dimming commands
+        <dd> support for dimming commands
              <br/>value ranges from 0.0 to 1.0. Similar to above <b><i>bri</i></b> parameter, except this has been normalized to [0.0 - 1.0] range.
              <br/>
              When dimming command is not used, this parameter will be 0.0 for "off" and 1.0 for "on" command.
@@ -86,17 +87,25 @@
     </dl>
 
     <h3>Notes</h3>
+    
     <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of Device Name is ok, but you would also need to re-discover devices again.</p>
 
     <h3>FAQ</h3>
+    
     <p><b>Does is support German or other languages?</b>
       <br/>Maybe. In theory, it should support all languages that Alexa is able to support. We don't know for sure. We don't know for sure. Please let us know if you have the answer <a href="mailto:hello@originally.us">hello@originally.us</a>
     </p>
+    
     <p><b>Do I need to enable any Alexa Skils?</b>
       <br/>No. Nah. Non. Nein. Never.
     </p>
+
     <p><b>I have some suggestion, how do I contact you?</b>
       <br/>Please drop us an <a href="mailto:hello@originally.us">email</a>, or create an issue in our <a href="https://github.com/originallyus/node-red-contrib-alexa-local/issues" target="_blank">Github</a>
+    </p>
+
+    <p><b>How do I control my (non-smart) devices at home with NodeRED?</b>
+      <br/>Check out <a href="https://play.google.com/store/apps/details?id=us.originally.tasker&hl=en" target="_blank">RMPlugin app</a> also developed by us. Here's an <a href="https://www.youtube.com/watch?v=QUKYKhK57sc" target="_blank">intro video</a> about the hardware.
     </p>
 
 </script>
