@@ -49,3 +49,7 @@ Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.origin
   * Alexa isolation
   * More convenient output variables (?)
   * Support RGB colors
+
+
+
+Originally US - a mobile app development company from Singapore
