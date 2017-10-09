@@ -8,8 +8,15 @@ This is a dead-simple node for adding Alexa capability to your NodeRED flow.
 
 **NO complicated parameters, it just works.**
 
+
 Developed by the super cool forks at [Originally US](http://originally.us)
 
+## Installation
+
+Change your working directory to your node red installation. Usually it's in ~/.node-red.
+
+    $ npm install node-red-contrib-alexa-local
+    
 ## How to use
   * Add this node to your flow
   * Give it a unique **Device Name**
