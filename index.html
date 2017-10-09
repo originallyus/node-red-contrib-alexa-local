@@ -15,14 +15,13 @@
         color: '#3FADB5',
         defaults: {
             name: {value:""},
-            devicename: {value:"", required:true},
-            dimmable: {value:""}
+            devicename: {value:"", required:true}
         },
-        inputs:1,
+        inputs:0,
         outputs:1,
         icon: "alexa-local.png",
         label: function() {
-            return this.devicename||"alexa-device";
+            return this.devicename || "alexa-device";
         }
     });
 </script>
@@ -36,12 +35,8 @@
         <label for="node-input-devicename"><i class="icon-tag"></i> Device Name</label>
         <input type="text" id="node-input-devicename" placeholder="Ceiling light">
     </div>
-    <div class="form-tips"><b>Note:</b> You will be using this Device Name to interact with Alexa. This has to be unique for each device.</div>
+    <div class="form-tips">Alexa uses this Device Name to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
 
-    <div class="form-row">
-        <label for="node-input-dimmable"><i class="icon-sliders"></i> Dimmable</label>
-        <input type="checkbox" id="node-input-dimmable">
-    </div>
 </script>
 
 <script type="text/x-red" data-help-name="alexa-local">
@@ -52,8 +47,24 @@
          <dt>payload
              <span class="property-type">string | on/off</span>
          </dt>
-         <dd> on/off trigger from Alexa </dd>
-         <dt class="optional">brightness <span class="property-type">float</span></dt>
-         <dd> value ranges from 0.0 to 100.0. Use this property to get the variable level from dimming command such as "Alexa, dim the light to 49%".</dd>
+         <dd> "on" or "off" trigger from Alexa.
+              <br/>
+              when dimming command is issued, this payload stay "on" as long as bri > 0%.
+         </dd>
+         <dt>bri <span class="property-type">float | 0.0-100.0</span></dt>
+         <dd> support for dimming commands
+              <br/>value ranges from 0.0 to 100.0 (percent). Use this property to get the variable level from dimming command such as "Alexa, dim the light to 49%".
+              <br/>
+              When dimming command is not used, this parameter will be 0.0 for "on" and 100.0 for "off" command.
+         </dd>
+         <dt>bri_normalized<span class="property-type">float | 0.0-1.0</span></dt>
+         <dd> supports for dimming commands
+              <br/>value ranges from 0.0 to 1.0. Similar to above <b><i>bri</i></b> parameter, except this has been normalized to [0.0 - 1.0] range.
+              <br/>
+              When dimming command is not used, this parameter will be 0.0 for "on" and 1.0 for "off" command.
+         </dd>
       </dl>
+    <h3>TODO</h3>
+      <p>Port number should be automatically assigned</p>
+      <p>Support dimming</p>
 </script>

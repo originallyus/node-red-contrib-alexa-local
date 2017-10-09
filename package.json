@@ -21,6 +21,7 @@
     }
   },
   "dependencies": {
+    "ip": "^1.1.5",
     "peer-ssdp": "0.0.5"
   }
 }
