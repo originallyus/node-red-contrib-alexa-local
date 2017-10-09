@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-alexa-local",
-  "version": "0.0.1",
-  "description": "A Node-Red node emulating Phillips Hue that works directly with Alexa within local network",
+  "version": "0.1.0",
+  "description": "No extra Alexa Skills required. Works directly with Alexa in local network.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,7 @@
     "hue",
     "emulator"
   ],
-  "author": "Torin Nguyen <torinnguyen@gmail.com>",
+  "author": "Originally US <hello@originally.us>",
   "license": "ISC",
   "node-red": {
     "nodes": {

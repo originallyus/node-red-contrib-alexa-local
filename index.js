@@ -3,6 +3,7 @@ module.exports = function(RED)
     //variables placed here are shared by all nodes
     var storage = require('node-persist');
 
+    //NodeRED node constructor
     function AlexaLocalNode(config) 
     {
         RED.nodes.createNode(this, config);
@@ -104,27 +105,31 @@ module.exports = function(RED)
     function constructAllLightsConfig(lightId, deviceName, httpPort)
     {
         return '{ "lights": { "' + lightId + '": ' 
-            + constructOneLightsConfig(lightId, deviceName, httpPort) 
+            + constructOneLightConfig(lightId, deviceName, httpPort) 
             + '} }';
     }
 
-    function constructOneLightsConfig(lightId, deviceName, httpPort)
+    function constructOneLightConfig(lightId, deviceName, httpPort)
     {
         return '{"state": {"on": false, "bri": 254, "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT001", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
     }
 
-    function constructSetupXml(lightId, deviceName, httpPort)
+    function constructBridgeSetupXml(lightId, deviceName, httpPort)
     {
         //IP Address of this local machine
         var ip = require("ip").address();
 
-        var fs = require('fs');
-        var rawXml = fs.readFileSync(__dirname + '/setup.xml');
-        rawXml = rawXml.toString();
-        rawXml = rawXml.replace("IP_ADDRESS_WITH_PORT", ip + ":" + httpPort);
-        rawXml = rawXml.replace("UUID_UUID_UUID", lightId);
+        //Todo: change this to some other uuid value
+        var bridgeUUID = lightId;
 
-        return rawXml;
+        //Load setup.xml & replace dynamic values
+        var fs = require('fs');
+        var setupXml = fs.readFileSync(__dirname + '/setup.xml');
+        setupXml = setupXml.toString();
+        setupXml = setupXml.replace("IP_ADDRESS_WITH_PORT", ip + ":" + httpPort);
+        setupXml = setupXml.replace("UUID_UUID_UUID", bridgeUUID);
+
+        return setupXml;
     }
 
 
@@ -132,6 +137,9 @@ module.exports = function(RED)
     // Handle HTTP Request / Hue API
     // -----------------------------------------------------------------------------------------------
 
+    /*
+     * Hue API emulation
+     */
     function handleHueApiRequestFunction(request, response, thisNode, config)
     {
         //console.log(request.method, request.url, request.connection.remoteAddress);
@@ -169,7 +177,7 @@ module.exports = function(RED)
             //GET 1 single light info
             else {
                 console.log("Sending light " + uuid + " to " + request.connection.remoteAddress);
-                var lightJson = constructOneLightsConfig(uuid, deviceName, httpPort);
+                var lightJson = constructOneLightConfig(uuid, deviceName, httpPort);
                 response.writeHead(200, {'Content-Type': 'application/json'});
                 response.end(lightJson);
             }
@@ -189,7 +197,7 @@ module.exports = function(RED)
         else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
             //console.log("Sending setup.xml to " + request.connection.remoteAddress);
-            var rawXml = constructSetupXml(lightId, deviceName, httpPort);
+            var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
             thisNode.status({fill:"yellow", shape:"dot", text:"/setup.xml (p:" + httpPort + ")"});
             response.writeHead(200, {'Content-Type': 'application/xml'});
             response.end(rawXml);    
@@ -200,6 +208,9 @@ module.exports = function(RED)
     // Handle HTTP Request / Alexa
     // -----------------------------------------------------------------------------------------------
 
+    /*
+     * Handle actual valid request to on/off device
+     */
     function handleAlexaDeviceRequestFunction(request, response, thisNode, config, uuid)
     {
         //Sanity check
