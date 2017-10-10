@@ -62,9 +62,10 @@ module.exports = function(RED)
     function startSSDP(thisNode, port, config)
     {
         //Sanity check
-        if (port === null || port <= 0) {
-            var errorMsg = "port is undefined";
+        if (port === null || port === undefined || port <= 0 || port > 65536) {
+            var errorMsg = "port is undefined (" + port + ")";
             thisNode.status({fill:"red", shape:"ring", text:errorMsg});
+            console.log(errorMsg);
             return;
         }
 
@@ -187,7 +188,7 @@ module.exports = function(RED)
         else if (/^\/api/.exec(request.url)) 
         {
             //console.log("Sending all lights json to " + request.connection.remoteAddress);
-            thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
+            //thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
             var allLightsConfig = constructAllLightsConfig(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/json'});
             response.end(allLightsConfig);
@@ -197,8 +198,8 @@ module.exports = function(RED)
         else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
             //console.log("Sending setup.xml to " + request.connection.remoteAddress);
+            //thisNode.status({fill:"yellow", shape:"dot", text:"/setup.xml (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
-            thisNode.status({fill:"yellow", shape:"dot", text:"/setup.xml (p:" + httpPort + ")"});
             response.writeHead(200, {'Content-Type': 'application/xml'});
             response.end(rawXml);    
         }
@@ -267,6 +268,9 @@ module.exports = function(RED)
      */
     function formatUUID(lightId) 
     {
+        if (lightId === null || lightId === undefined)
+            return "";
+
         var string = ("" + lightId);
         return string.replace(".", "").trim();
     }
@@ -276,12 +280,14 @@ module.exports = function(RED)
      */
     function getPortForUUID(lightId) 
     {
-        if (storage == null)
+        if (storage === null || storage === undefined)
+            return 0;
+        if (lightId === null || lightId === undefined)
             return 0;
 
         var key = formatUUID(lightId);
         var port = storage.getItemSync(key);
-        if (port === null)
+        if (port === null || port === undefined || port <= 0 || port > 65536)
             return 0;
 
         return port;
