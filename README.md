@@ -15,6 +15,10 @@ Developed by the super cool forks at [Originally US](http://originally.us)
 
 ## Installation
 
+Install directly from your NodeRED's Setting Pallete
+
+or
+
 Change your working directory to your node red installation. Usually it's in ~/.node-red.
 
     $ npm install node-red-contrib-alexa-local
