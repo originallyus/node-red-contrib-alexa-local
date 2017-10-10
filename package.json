@@ -3,6 +3,15 @@
   "version": "0.1.6",
   "description": "No extra Alexa Skills required. Works directly with Alexa in local network.",
   "main": "index.js",
+  "homepage" : "https://github.com/originallyus/node-red-contrib-alexa-local",
+  "bugs": {
+    "url" : "https://github.com/originallyus/node-red-contrib-alexa-local/issues",
+    "email" : "hello@originally.us"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/originallyus/node-red-contrib-alexa-local.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
