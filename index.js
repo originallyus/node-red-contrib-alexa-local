@@ -62,10 +62,10 @@ module.exports = function(RED)
     function startSSDP(thisNode, port, config)
     {
         //Sanity check
-        if (port === null || port === undefined || port <= 0 || port > 65536) {
-            var errorMsg = "port is undefined (" + port + ")";
+        if (port === null || port === undefined || port <= 0 || port >= 65536) {
+            var errorMsg = "port is in valid (" + port + ")";
             thisNode.status({fill:"red", shape:"ring", text:errorMsg});
-            console.log(errorMsg);
+            console.error(errorMsg);
             return;
         }
 
@@ -120,8 +120,8 @@ module.exports = function(RED)
         //IP Address of this local machine
         var ip = require("ip").address();
 
-        //Todo: change this to some other uuid value
-        var bridgeUUID = lightId;
+        //TODO: change this to a dynamic value
+        var bridgeUUID = "710b962e-041c-11e1-9234-0123456789ab";
 
         //Load setup.xml & replace dynamic values
         var fs = require('fs');
@@ -287,7 +287,7 @@ module.exports = function(RED)
 
         var key = formatUUID(lightId);
         var port = storage.getItemSync(key);
-        if (port === null || port === undefined || port <= 0 || port > 65536)
+        if (port === null || port === undefined || port <= 0 || port >= 65536)
             return 0;
 
         return port;
