@@ -41,6 +41,17 @@ module.exports = function(RED)
             //Start discovery service after we know the port number            
             startSSDP(thisNode, actualPort, config);
         });
+
+        //Clean up procedure before re-deploy
+        this.on('close', function(removed, done) {
+            httpServer.close(function(){
+                done()
+            });
+            setImmediate(function(){
+                server.emit('close')
+            });
+            done();
+        });
     }
 
     //NodeRED registration
@@ -156,6 +167,7 @@ module.exports = function(RED)
 
         var url = request.url;
         var lightMatch = /^\/api\/(\w*)\/lights\/([\w\-]*)/.exec(request.url);
+        var authMatch = /^\/api\/(\w*)/.exec(request.url);
 
         //Control 1 single light
         if (lightMatch)
@@ -182,6 +194,19 @@ module.exports = function(RED)
                 response.writeHead(200, {'Content-Type': 'application/json'});
                 response.end(lightJson);
             }
+        }
+
+        //Authorization step (press button on Hue Bridge)
+        else if (authMatch) 
+        {
+            const HUE_USERNAME = "1028d66426293e821ecfd9ef1a0731df";
+            var responseStr = '[{"success":{"username":"' + HUE_USERNAME + '"}}]';
+
+            //Response to Hue app
+            console.log("Sending response to " + request.connection.remoteAddress, responseStr);
+            thisNode.status({fill:"blue", shape:"dot", text:"auth" + " (p:" + httpPort + ")"});
+            response.writeHead(200, "OK", {'Content-Type': 'application/json'});
+            response.end(responseStr);
         }
 
         //List all lights
