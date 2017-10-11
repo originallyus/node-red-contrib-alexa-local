@@ -72,11 +72,11 @@
              <br/>
              when dimming command is issued, this payload stays "on" as long as <b><i>bri</i></b> > 0. In other words, payload == "off" only when <b><i>bri</i></b> == 0.
         </dd>
-        <dt>bri <span class="property-type">float | 0.0-100.0</span></dt>
+        <dt>bri <span class="property-type">int | 0-100</span></dt>
         <dd> support for dimming commands
-             <br/>value ranges from 0.0 to 100.0 (percent). Use this property to get the variable level from dimming command such as "Alexa, dim the light to 49%".
+             <br/>value ranges from 0 to 100 (percent). Use this property to get the variable level from dimming command such as "Alexa, dim the light to 49%".
              <br/>
-             When dimming command is not used, this parameter will be 0.0 for "off" and 100.0 for "on" command.
+             When dimming command is not used, this parameter will be 0 for "off" and 100 for "on" command.
         </dd>
         <dt>bri_normalized<span class="property-type">float | 0.0-1.0</span></dt>
         <dd> support for dimming commands
@@ -93,7 +93,11 @@
     <h3>FAQ</h3>
     
     <p><b>Does is support German or other languages?</b>
-      <br/>Maybe. In theory, it should support all languages that Alexa is able to support. We don't know for sure. We don't know for sure. Please let us know if you have the answer <a href="mailto:hello@originally.us">hello@originally.us</a>
+      <br/>Yes!
+    </p>
+
+    <p><b>Does is support door lock/curtain/AV/TV or other types of devices?</b>
+      <br/>Unfortunately no. In order to keep this node so simple to use. it was designed to emulate a Philips Hue bridge & device. Amazon Echo is hardcoded to support only on/off/dimming command via this route. Any other type of support has to go through the Alexa Skills route (cloud-based). There is another node does just that <a href="https://github.com/hardillb/node-red-contrib-alexa-home-skill" target="_blank">node-red-contrib-alexa-home-skill</a>
     </p>
     
     <p><b>Do I need to enable any Alexa Skils?</b>

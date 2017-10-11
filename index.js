@@ -240,8 +240,8 @@ module.exports = function(RED)
 
         //Massage brightness parameter
         if (msg.bri) {
-            msg.bri_normalized = msg.bri / 255.0;
-            msg.bri = msg.bri / 255.0 * 100.0;
+            msg.bri = Math.round(msg.bri / 255.0 * 100.0);
+            msg.bri_normalized = msg.bri / 100.0;
         } else {
             msg.bri = (onoff == "on") ? 100.0 : 0.0;
             msg.bri_normalized = (onoff == "on") ? 1.0 : 0.0;
