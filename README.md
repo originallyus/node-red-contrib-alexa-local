@@ -34,7 +34,10 @@ Change your working directory to your node red installation. Usually it's in ~/.
 
 ## FAQ
 ##### Does is support German or other languages?
-Maybe. In theory, it should support all languages that Alexa is able to support. We don't know for sure. Please let us know if you have the answer [hello@originally.us](mailto:hello@originally.us)
+Yes!
+
+##### Does is support door lock/curtain/AV/TV or other types of devices?
+Unfortunately no. In order to keep this node so simple to use, it was designed to emulate a Philips Hue bridge & device within local network. Amazon Echo is hardcoded to support only on/off/dimming command via this route. Any other type of support has to go through the Alexa Skills route (cloud-based). There is another node does just that [node-red-contrib-alexa-home-skill](https://github.com/hardillb/node-red-contrib-alexa-home-skill)
 
 ##### Do I need to enable any Alexa Skils?
 No. Nah. Non. Nein. Never.
