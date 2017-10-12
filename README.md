@@ -11,7 +11,7 @@ This is a dead-simple node for adding Alexa capability to your NodeRED flow.
 **NO complicated parameters, it just works.**
 
 
-Developed by the super cool forks at [Originally US](http://originally.us) - a mobile app development company from Singapore
+Developed by the super cool folks at [Originally US](http://originally.us) - a mobile app development company from Singapore
 
 ## Installation
 
