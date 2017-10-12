@@ -272,6 +272,11 @@ module.exports = function(RED)
             msg.bri_normalized = (onoff == "on") ? 1.0 : 0.0;
         }
 
+        //Add extra device parameters
+        msg.device_name = deviceName;
+        msg.light_id = lightId;
+        msg.port = httpPort;
+
         //Send the message to next node
         thisNode.send(msg);
 
