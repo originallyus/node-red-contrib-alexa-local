@@ -48,7 +48,7 @@ module.exports = function(RED)
                 done()
             });
             setImmediate(function(){
-                server.emit('close')
+                httpServer.emit('close')
             });
             done();
         });
