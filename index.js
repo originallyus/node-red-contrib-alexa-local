@@ -43,9 +43,10 @@ module.exports = function(RED)
         });
 
         //Clean up procedure before re-deploy
-        thisNode.on('close', function(removed, done) {
+        thisNode.on('close', function(removed, doneFunction) {
             httpServer.close(function(){
-                done();
+                if (typeof doneFunction === 'function')
+                    doneFunction();
             });
             setImmediate(function(){
                 httpServer.emit('close');
