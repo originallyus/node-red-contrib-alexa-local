@@ -167,7 +167,7 @@ module.exports = function(RED)
 
         var url = request.url;
         var lightMatch = /^\/api\/(\w*)\/lights\/([\w\-]*)/.exec(request.url);
-        var authMatch = /^\/api\/(\w*)/.exec(request.url);
+        var authMatch = /^\/api\/(\w*)/.exec(request.url) && (request.method == 'POST');
 
         //Control 1 single light
         if (lightMatch)
