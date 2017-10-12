@@ -43,14 +43,13 @@ module.exports = function(RED)
         });
 
         //Clean up procedure before re-deploy
-        this.on('close', function(removed, done) {
+        thisNode.on('close', function(removed, done) {
             httpServer.close(function(){
-                done()
+                done();
             });
             setImmediate(function(){
-                httpServer.emit('close')
+                httpServer.emit('close');
             });
-            done();
         });
     }
 
