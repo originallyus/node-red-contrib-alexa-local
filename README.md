@@ -53,5 +53,7 @@ Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.origin
 
 
 ## TODO
+  * Emulate using 1 bridge per 25 devices instead of 1 bridge per device
   * Alexa isolation
   * More convenient output variables (?)
+  * Make use of huejay library
