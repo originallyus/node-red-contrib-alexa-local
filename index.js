@@ -18,7 +18,7 @@ module.exports = function(RED)
         //Restore saved port number, if any
         //port == 0 when not available -> any available port (first time)
         var lightId = formatUUID(config.id);
-        var port = getPortForUUID(lightId);
+        var port = getPortForLightId(lightId);
 
         //HTTP Server to host the Hue API
         var http = require('http');
@@ -36,13 +36,25 @@ module.exports = function(RED)
             var actualPort = httpServer.address().port;
 
             //Persist the port number attached to this NodeID
-            setPortForUUID(lightId, actualPort);
+            setPortForLightId(lightId, actualPort);
 
             config.port = actualPort;
             thisNode.status({fill:"green", shape:"dot", text:"online (p:" + actualPort + ")"});
 
             //Start discovery service after we know the port number            
             startSSDP(thisNode, actualPort, config);
+        });
+
+        //Input to update 'bri' value
+        thisNode.on('input', function(msg) {
+            if (msg.payload === null || msg.payload === undefined || msg.payload < 0 || msg.payload > 100) {
+                thisNode.status({fill:"red", shape:"dot", text:"invalid payload received"});
+                return;
+            }
+
+            var bri = Math.round(msg.payload / 100.0 * 255.0);
+            setLightBriForLightId(lightId, bri);
+            thisNode.status({fill:"blue", shape:"dot", text:"updated bri:" + msg.payload});
         });
 
         //Clean up procedure before re-deploy
@@ -54,17 +66,15 @@ module.exports = function(RED)
             setImmediate(function(){
                 httpServer.emit('close');
             });
+            if (removed) {
+                clearPortForLightId(lightId);
+                clearLightBriForLightId(lightId);
+            }
         });
     }
 
     //NodeRED registration
     RED.nodes.registerType("alexa-local", AlexaLocalNode, {
-      settings: {
-          alexaLocalAlexaDeviceName: {
-              value: "Light",
-              exportable: true
-          }
-      }
     });
 
 
@@ -273,13 +283,28 @@ module.exports = function(RED)
         if (msg.bri && msg.bri == bri_default + 63)     //magic number
             msg.change_direction = 1;
 
-        //Massage brightness parameter
+        //Dimming or Temperature command
         if (msg.bri) {
+            //Save the last value (raw value)
+            setLightBriForLightId(lightId, msg.bri);
+
             msg.bri = Math.round(msg.bri / 255.0 * 100.0);
             msg.bri_normalized = msg.bri / 100.0;
-        } else {
-            msg.bri = (onoff == "on") ? 100.0 : 0.0;
-            msg.bri_normalized = (onoff == "on") ? 1.0 : 0.0;
+        }
+        //On/off command
+        else {
+            var isOn = (onoff == "on")
+            msg.bri = isOn ? 100 : 0;
+            msg.bri_normalized = isOn ? 1.0 : 0.0;
+
+            //Restore the previous value before off command
+            if (isOn) {
+                var temp = getLightBriForLightId(lightId);
+                if (temp && temp > 0) {
+                    msg.bri = Math.round(temp / 255.0 * 100.0);
+                    msg.bri_normalized = msg.bri / 100.0;
+                }
+            }
         }
 
         //Add extra device parameters
@@ -318,7 +343,7 @@ module.exports = function(RED)
     /*
      * Retrieve the port number used by a given NodeId from persistent storage
      */
-    function getPortForUUID(lightId) 
+    function getPortForLightId(lightId) 
     {
         if (storage === null || storage === undefined)
             return 0;
@@ -326,21 +351,69 @@ module.exports = function(RED)
             return 0;
 
         var key = formatUUID(lightId);
-        var port = storage.getItemSync(key);
-        if (port === null || port === undefined || port <= 0 || port >= 65536)
+        var value = storage.getItemSync(key);
+        if (value === null || value === undefined || value <= 0 || value >= 65536)
             return 0;
 
-        return port;
+        return value;
     }
 
     /*
      * Save the port number used by a given NodeId to persistent storage
      */
-    function setPortForUUID(lightId, port) 
+    function setPortForLightId(lightId, value) 
     {
         var key = formatUUID(lightId);
         if (storage)
-            storage.setItemSync(key, port);
+            storage.setItemSync(key, value);
+    }
+
+    /*
+     * Remove the port number used by a given NodeId in persistent storage
+     */
+    function clearPortForLightId(lightId) 
+    {
+        var key = formatUUID(lightId);
+        if (storage)
+            storage.removeItemSync(key);
+    }
+
+    /*
+     * Retrieve the 'bri' value used by a given NodeId from persistent storage
+     */
+    function getLightBriForLightId(lightId) 
+    {
+        if (storage === null || storage === undefined)
+            return null;
+        if (lightId === null || lightId === undefined)
+            return null;
+
+        var key = formatUUID(lightId) + "_bri";
+        var value = storage.getItemSync(key);
+        if (value === null || value === undefined || value <= 0 || value >= 65536)
+            return null;
+
+        return value;
+    }
+
+    /*
+     * Save the 'bri' value used by a given NodeId to persistent storage
+     */
+    function setLightBriForLightId(lightId, value) 
+    {
+        var key = formatUUID(lightId) + "_bri";
+        if (storage)
+            storage.setItemSync(key, value);
+    }
+
+    /*
+     * Remove the 'bri' value used by a given NodeId in persistent storage
+     */
+    function clearLightBriForLightId(lightId) 
+    {
+        var key = formatUUID(lightId) + "_bri";
+        if (storage)
+            storage.removeItemSync(key);
     }
 
 }

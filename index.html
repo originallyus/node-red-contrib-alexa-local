@@ -1,43 +1,25 @@
 <script type="text/javascript">
-    function generateUUID() { // Public Domain/MIT
-      var d = new Date().getTime();
-      if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-          d += performance.now(); //use high-precision timer if available
-      }
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          var r = (d + Math.random() * 16) % 16 | 0;
-          d = Math.floor(d / 16);
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-      });
-    }
     RED.nodes.registerType('alexa-local',{
         category: 'input',
         color: '#3FADB5',
         defaults: {
-            name: {value:""},
             devicename: {value:"", required:true}
         },
-        inputs:0,
+        inputs:1,
         outputs:1,
         icon: "alexa-local.png",
         label: function() {
-            return this.devicename || "alexa-device";
+            return this.devicename || "Alexa device";
         }
     });
 </script>
 
 <script type="text/x-red" data-template-name="alexa-local">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-tips">This is simply the name of your node, it is not seen by Alexa.</div>
-
-    <div class="form-row">
-        <label for="node-input-devicename"><i class="icon-tag"></i> Device Name</label>
+        <label for="node-input-devicename"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-devicename" placeholder="Ceiling light">
     </div>
-    <div class="form-tips">Alexa uses this <b>Device Name</b> to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
+    <div class="form-tips">Alexa uses this <b>Name</b> to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
 </script>
 
 <script type="text/x-red" data-help-name="alexa-local">
@@ -51,7 +33,7 @@
     <h3>How to use</h3>
     <ul> 
       <li>Add this node to your flow</li>
-      <li>Give it a unique <b>Device Name</b></li>
+      <li>Give it a unique <b>Name</b></li>
       <li>Ask "Alexa, discover devices"</li>
       <li>That's it!</li>
     </ul>
@@ -84,32 +66,54 @@
              <br/>
              When dimming command is not used, this parameter will be 0.0 for "off" and 1.0 for "on" command.
         </dd>
+        <dt>change_direction<span class="property-type">int | -1/0/1</span></dt>
+        <dd> support for decrease/increase command
+             <br/>when decrease/increase command is issued, this parameter is set to -1/1 accordingly; normally it is 0.
+        </dd>
+        <dt>others...</dt>
+        <dd> attach a Debug node for complete msg object to see other parameters available</dd>
+    </dl>
+
+    <h3>Input (optional)</h3>
+    
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">int | 0-100</span>
+        </dt>
+        <dd> This is for updating the 'bri' value when there are external changes to the device via other inputs.
+        </dd>
     </dl>
 
     <h3>Notes</h3>
     
-    <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of Device Name is ok, but you would also need to re-discover devices again.</p>
+    <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of <b>Name</b> is supported, but you would need to ask Alexa to re-discover devices again.</p>
 
     <h3>FAQ</h3>
     
     <p><b>Does is support German or other languages?</b>
-      <br/>Yes!
+      <br/>Yes! As long as Alexa supports that language.
     </p>
 
     <p><b>Does is support door lock/curtain/AV/TV or other types of devices?</b>
       <br/>Unfortunately no. In order to keep this node so simple to use, it was designed to emulate a Philips Hue bridge & device within local network. Amazon Echo is hardcoded to support only on/off/dimming command via this route. Any other type of support has to go through the Alexa Skills route (cloud-based). There is another node does just that <a href="https://github.com/hardillb/node-red-contrib-alexa-home-skill" target="_blank">node-red-contrib-alexa-home-skill</a>
     </p>
     
+    <p><b>Example dimming commands</b>
+      <br/> • Alexa, set Kitchen Light to 40%
+      <br/> • Alexa, set Aircon temperature to 30
+      <br/> • Alexa, increase Kitchen Light
+      <br/> • Alexa, lower Kitchen Light by 15%
+    </p>
+
     <p><b>Do I need to enable any Alexa Skils?</b>
       <br/>No. Nah. Non. Nein. Never.
     </p>
 
     <p><b>I have some suggestion, how do I contact you?</b>
-      <br/>Please drop us an <a href="mailto:hello@originally.us">email</a>, or create an issue in our <a href="https://github.com/originallyus/node-red-contrib-alexa-local/issues" target="_blank">Github</a>
+      <br/>Please create an issue in <a href="https://github.com/originallyus/node-red-contrib-alexa-local/issues" target="_blank">Github</a>
     </p>
 
     <p><b>How do I control my (non-smart) devices at home with NodeRED?</b>
       <br/>Check out <a href="https://play.google.com/store/apps/details?id=us.originally.tasker&hl=en" target="_blank">RMPlugin app</a> also developed by us. Here's an <a href="https://www.youtube.com/watch?v=QUKYKhK57sc" target="_blank">intro video</a> about the hardware.
     </p>
-
 </script>
