@@ -290,6 +290,8 @@ module.exports = function(RED)
 
             msg.bri = Math.round(msg.bri / 255.0 * 100.0);
             msg.bri_normalized = msg.bri / 100.0;
+            msg.on = msg.bri > 0;
+            msg.payload = msg.on ? "on" : "off";
         }
         //On/off command
         else {
@@ -298,12 +300,18 @@ module.exports = function(RED)
             msg.bri_normalized = isOn ? 1.0 : 0.0;
 
             //Restore the previous value before off command
+            var savedBri = getLightBriForLightId(lightId);
             if (isOn) {
-                var temp = getLightBriForLightId(lightId);
-                if (temp && temp > 0) {
-                    msg.bri = Math.round(temp / 255.0 * 100.0);
+                if (savedBri && savedBri > 0) {
+                    msg.bri = Math.round(savedBri / 255.0 * 100.0);
                     msg.bri_normalized = msg.bri / 100.0;
                 }
+            }
+            //Output the saved bri value for troubleshooting
+            else {
+                if (savedBri) 
+                    msg.saved_bri = Math.round(savedBri / 255.0 * 100.0);
+                    msg.save_bri_normalized = msg.saved_bri / 100.0;
             }
         }
 
