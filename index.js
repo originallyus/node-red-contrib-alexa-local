@@ -50,14 +50,7 @@ module.exports = function(RED)
 
         //Input to update 'bri' value
         thisNode.on('input', function(msg) {
-            if (msg.payload === null || msg.payload === undefined || msg.payload < 0 || msg.payload > 100) {
-                thisNode.status({fill:"red", shape:"dot", text:"invalid payload received"});
-                return;
-            }
-
-            var bri = Math.round(msg.payload / 100.0 * 255.0);
-            setLightBriForLightId(lightId, bri);
-            thisNode.status({fill:"blue", shape:"dot", text:"updated bri:" + msg.payload});
+            handleInputMessage(thisNode, config, msg);
         });
 
         //Clean up procedure before re-deploy
@@ -262,15 +255,6 @@ module.exports = function(RED)
             return;
         }
 
-        //Node parameters
-        var lightId = formatUUID(config.id);
-        var deviceName = "";
-        if (config.devicename)
-            deviceName = config.devicename;
-        var httpPort = 8082;
-        if (config.port && config.port > 0)
-            httpPort = config.port;
-
         //Use the json from Alexa as the base for our msg
         var msg = request.data;
 
@@ -279,6 +263,25 @@ module.exports = function(RED)
         if (request.data.on)
             onoff = "on";
         msg.payload = onoff;
+
+        justDoIt(thisNode, config, uuid, msg);
+
+        //Response to Alexa
+        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":true}}]';
+        console.log("Sending response to " + request.connection.remoteAddress, responseStr);
+        response.writeHead(200, "OK", {'Content-Type': 'application/json'});
+        response.end(responseStr);
+    }
+
+    function justDoIt(thisNode, config, uuid, msg)
+    {
+        //Node parameters
+        var deviceName = "";
+        if (config.devicename)
+            deviceName = config.devicename;
+        var httpPort = 8082;
+        if (config.port && config.port > 0)
+            httpPort = config.port;
 
         //Detect increase/decrease command
         msg.change_direction = 0;
@@ -290,21 +293,24 @@ module.exports = function(RED)
         //Dimming or Temperature command
         if (msg.bri) {
             //Save the last value (raw value)
-            setLightBriForLightId(lightId, msg.bri);
+            setLightBriForLightId(uuid, msg.bri);
 
             msg.bri = Math.round(msg.bri / 255.0 * 100.0);
             msg.bri_normalized = msg.bri / 100.0;
             msg.on = msg.bri > 0;
             msg.payload = msg.on ? "on" : "off";
+
+            //Node status
+            thisNode.status({fill:"blue", shape:"dot", text:"bri:" + msg.bri + " (p:" + httpPort + ")"});
         }
         //On/off command
         else {
-            var isOn = (onoff == "on")
+            var isOn = (msg.payload == "on")
             msg.bri = isOn ? 100 : 0;
             msg.bri_normalized = isOn ? 1.0 : 0.0;
 
             //Restore the previous value before off command
-            var savedBri = getLightBriForLightId(lightId);
+            var savedBri = getLightBriForLightId(uuid);
             if (isOn) {
                 if (savedBri && savedBri > 0) {
                     msg.bri = Math.round(savedBri / 255.0 * 100.0);
@@ -313,26 +319,69 @@ module.exports = function(RED)
             }
             //Output the saved bri value for troubleshooting
             else {
-                if (savedBri) 
+                if (savedBri) {
                     msg.saved_bri = Math.round(savedBri / 255.0 * 100.0);
                     msg.save_bri_normalized = msg.saved_bri / 100.0;
+                }
             }
+
+            //Node status
+            thisNode.status({fill:"blue", shape:"dot", text:"" + msg.payload + " (p:" + httpPort + ")"});
         }
 
         //Add extra device parameters
         msg.device_name = deviceName;
-        msg.light_id = lightId;
+        msg.light_id = uuid;
         msg.port = httpPort;
 
         //Send the message to next node
         thisNode.send(msg);
+    }
 
-        //Response to Alexa
-        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":true}}]';
-        console.log("Sending response to " + request.connection.remoteAddress, responseStr);
-        thisNode.status({fill:"blue", shape:"dot", text:"" + onoff + " (p:" + httpPort + ")"});
-        response.writeHead(200, "OK", {'Content-Type': 'application/json'});
-        response.end(responseStr);
+
+    // -----------------------------------------------------------------------------------------------
+    // Input Hanlding
+    // -----------------------------------------------------------------------------------------------
+
+    function handleInputMessage(thisNode, config, msg)
+    {
+        if (msg == null || msg.payload === null || msg.payload === undefined) {
+            thisNode.status({fill:"red", shape:"dot", text:"invalid payload received"});
+            return;
+        }
+
+        var lightId = formatUUID(config.id);
+
+        var briInput = 0;
+        msg.payload = "" + msg.payload;
+        msg.payload = msg.payload.trim().toLowerCase();
+        if (msg.payload === "on") {
+            msg.payload = "on";
+            briInput = 100;
+        }
+        else if (msg.payload === "off") {
+            msg.payload = "off";
+            briInput = 0;
+        }
+        else {
+            briInput = Math.round(parseFloat(msg.payload));
+            msg.bri = Math.round(parseFloat(msg.payload) / 100.0 * 255.0);
+            msg.payload = (msg.bri > 0) ? "on" : "off";
+        }
+
+        //Check if we want to trigger the node
+        var inputTrigger = false;
+        if (config.inputtrigger)
+            inputTrigger = config.inputtrigger;
+        if (inputTrigger) {
+            justDoIt(thisNode, config, lightId, msg);
+            return;
+        }
+
+        //No trigger, simply update the internal 'bri' value
+        var bri = Math.round(briInput / 100.0 * 255.0);
+        setLightBriForLightId(lightId, bri);
+        thisNode.status({fill:"blue", shape:"dot", text:"updated bri:" + briInput});
     }
 
 

@@ -3,7 +3,8 @@
         category: 'input',
         color: '#3FADB5',
         defaults: {
-            devicename: {value:"", required:true}
+            devicename: {value:"", required:true},
+            inputtrigger: {value:false}
         },
         inputs:1,
         outputs:1,
@@ -19,21 +20,29 @@
         <label for="node-input-devicename"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-devicename" placeholder="Ceiling light">
     </div>
-    <div class="form-tips">Alexa uses this <b>Name</b> to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
+    <div class="form-tips">Alexa uses this <strong>Name</strong> to indentify your device by voice. This has to be unique for each device. If you have renamed your device, please ask Alexa to discover again.</div>
+
+    <p></p>
+
+    <div class="form-row">
+        <label for="node-input-inputtrigger"><i class="icon-tag"></i> Input Trigger</label>
+        <input type="checkbox" id="node-input-inputtrigger">
+    </div>
+    <div class="form-tips">Enable execution of this node via <strong>Input</strong> signal. Please refer to node Info for valid formats for input parameter. Be careful of infinite loop if you enable this.</div>
 </script>
 
 <script type="text/x-red" data-help-name="alexa-local">
     <p>This is a dead-simple node for adding Alexa capability to your flow.
       <br/>
-      <b>NO extra Alexa Skills required.</b>
+      <strong>NO extra Alexa Skills required.</strong>
       <br/>
-      <b>NO account linking required.</b>
+      <strong>NO account linking required.</strong>
     </p>
 
     <h3>How to use</h3>
     <ul> 
       <li>Add this node to your flow</li>
-      <li>Give it a unique <b>Name</b></li>
+      <li>Give it a unique <strong>Name</strong></li>
       <li>Ask "Alexa, discover devices"</li>
       <li>That's it!</li>
     </ul>
@@ -41,7 +50,7 @@
     <p><a href="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot2.png" target="_blank"><img src="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot2.png"></a></p>
 
     <p>
-        Developed by the super cool folks at <a href="http://originally.us" target="_blank"><b>Originally US</b></a>
+        Developed by the super cool folks at <a href="http://originally.us" target="_blank"><strong>Originally US</strong></a>
     <p/>
 
     <h3>Outputs</h3>
@@ -52,7 +61,7 @@
         </dt>
         <dd> "on" or "off" trigger from Alexa.
              <br/>
-             when dimming command is issued, this payload stays "on" as long as <b><i>bri</i></b> > 0. In other words, payload == "off" only when <b><i>bri</i></b> == 0.
+             when dimming command is issued, this payload stays "on" as long as <strong><i>bri</i></strong> > 0. In other words, payload == "off" only when <strong><i>bri</i></strong> == 0.
         </dd>
         <dt>bri <span class="property-type">int | 0-100</span></dt>
         <dd> support for dimming commands
@@ -62,7 +71,7 @@
         </dd>
         <dt>bri_normalized<span class="property-type">float | 0.0-1.0</span></dt>
         <dd> support for dimming commands
-             <br/>value ranges from 0.0 to 1.0. Similar to above <b><i>bri</i></b> parameter, except this has been normalized to [0.0 - 1.0] range.
+             <br/>value ranges from 0.0 to 1.0. Similar to above <strong><i>bri</i></strong> parameter, except this has been normalized to [0.0 - 1.0] range.
              <br/>
              When dimming command is not used, this parameter will be 0.0 for "off" and 1.0 for "on" command.
         </dd>
@@ -78,42 +87,48 @@
     
     <dl class="message-properties">
         <dt>payload
-            <span class="property-type">int | 0-100</span>
+            <span class="property-type">on/off/0-100</span>
         </dt>
         <dd> This is for updating the 'bri' value when there are external changes to the device via other inputs.
+          <br/>If <strong>'Input Trigger'</strong> is enabled, this will also trigger this node. Accepted values are:
+          <br/> • number: 0-100
+          <br/> • "off": equivalent to input 0
+          <br/> • "on": equivalent to input 100
         </dd>
+
+        <p><a href="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot_input.png" target="_blank"><img src="https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot_input.png"></a></p>
     </dl>
 
     <h3>Notes</h3>
     
-    <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of <b>Name</b> is supported, but you would need to ask Alexa to re-discover devices again.</p>
+    <p>Each Node ID is used to uniquely identify & persist each device seen by Alexa. If you delete and re-create this Node, the device is no longer the same. You would have to forget old device in Alexa app. Changing of <strong>Name</strong> is supported, but you would need to ask Alexa to re-discover devices again.</p>
 
     <h3>FAQ</h3>
     
-    <p><b>Does is support German or other languages?</b>
+    <p><strong>Does is support German or other languages?</strong>
       <br/>Yes! As long as Alexa supports that language.
     </p>
 
-    <p><b>Does is support door lock/curtain/AV/TV or other types of devices?</b>
+    <p><strong>Does is support door lock/curtain/AV/TV or other types of devices?</strong>
       <br/>Unfortunately no. In order to keep this node so simple to use, it was designed to emulate a Philips Hue bridge & device within local network. Amazon Echo is hardcoded to support only on/off/dimming command via this route. Any other type of support has to go through the Alexa Skills route (cloud-based). There is another node does just that <a href="https://github.com/hardillb/node-red-contrib-alexa-home-skill" target="_blank">node-red-contrib-alexa-home-skill</a>
     </p>
     
-    <p><b>Example dimming commands</b>
+    <p><strong>Example dimming commands</strong>
       <br/> • Alexa, set Kitchen Light to 40%
       <br/> • Alexa, set Aircon temperature to 30
       <br/> • Alexa, increase Kitchen Light
       <br/> • Alexa, lower Kitchen Light by 15%
     </p>
 
-    <p><b>Do I need to enable any Alexa Skils?</b>
+    <p><strong>Do I need to enable any Alexa Skils?</strong>
       <br/>No. Nah. Non. Nein. Never.
     </p>
 
-    <p><b>I have some suggestion, how do I contact you?</b>
+    <p><strong>I have some suggestion, how do I contact you?</strong>
       <br/>Please create an issue in <a href="https://github.com/originallyus/node-red-contrib-alexa-local/issues" target="_blank">Github</a>
     </p>
 
-    <p><b>How do I control my (non-smart) devices at home with NodeRED?</b>
+    <p><strong>How do I control my (non-smart) devices at home with NodeRED?</strong>
       <br/>Check out <a href="https://play.google.com/store/apps/details?id=us.originally.tasker&hl=en" target="_blank">RMPlugin app</a> also developed by us. Here's an <a href="https://www.youtube.com/watch?v=QUKYKhK57sc" target="_blank">intro video</a> about the hardware.
     </p>
 </script>
