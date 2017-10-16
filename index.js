@@ -21,10 +21,13 @@ module.exports = function(RED)
         var port = getPortForLightId(lightId);
 
         //HTTP Server to host the Hue API
+        //We use stoppable to kill the server completely upon a deploy
+        const graceMilliseconds = 500;
+        var stoppable = require('stoppable');
         var http = require('http');
-        var httpServer = http.createServer(function(request, response){
+        var httpServer = stoppable(http.createServer(function(request, response){
             handleHueApiRequestFunction(request, response, thisNode, config);
-        });
+        }), graceMilliseconds);
         httpServer.listen(port, function(error) {
             if (error) {
                 thisNode.status({fill:"red", shape:"ring", text:"unable to start"});
@@ -59,17 +62,18 @@ module.exports = function(RED)
 
         //Clean up procedure before re-deploy
         thisNode.on('close', function(removed, doneFunction) {
-            httpServer.close(function(){
-                if (typeof doneFunction === 'function')
-                    doneFunction();
-            });
-            setImmediate(function(){
-                httpServer.emit('close');
-            });
             if (removed) {
                 clearPortForLightId(lightId);
                 clearLightBriForLightId(lightId);
             }
+            httpServer.stop(function(){
+                if (typeof doneFunction === 'function')
+                    doneFunction();
+                console.log("AlexaLocalNode closing done...");
+            });
+            setImmediate(function(){
+                httpServer.emit('close');
+            });
         });
     }
 
