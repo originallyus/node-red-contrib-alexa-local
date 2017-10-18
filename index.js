@@ -109,7 +109,7 @@ module.exports = function(RED)
                 SERVER: "node.js/0.10.28 UPnP/1.1",
                 ST: "urn:schemas-upnp-org:device:basic:1",
                 USN: "uuid:Socket-1_0-221438K0100073::urn:Belkin:device:**",
-                LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml",
+                LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml"
             }, address);
         });
         peer.on("found",function(headers, address){
