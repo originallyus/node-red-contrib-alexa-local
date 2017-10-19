@@ -61,7 +61,6 @@ Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.origin
 ## TODO
   * Emulate using 1 bridge per 25 devices instead of 1 bridge per device
   * Alexa isolation
-  * Make use of huejay library
 
 
 <a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/675K2XU83RpTxWJP4HRjD8mC/originallyus/node-red-contrib-alexa-local'>

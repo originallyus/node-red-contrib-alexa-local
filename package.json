@@ -23,7 +23,7 @@
     "emulator"
   ],
   "author": "Originally US <hello@originally.us>",
-  "license": "ISC",
+  "license": "MIT",
   "node-red": {
     "nodes": {
       "alexa-local": "index.js"
