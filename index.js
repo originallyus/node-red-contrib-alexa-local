@@ -28,9 +28,31 @@ module.exports = function(RED)
         var httpServer = stoppable(http.createServer(function(request, response){
             handleHueApiRequestFunction(request, response, thisNode, config);
         }), graceMilliseconds);
+
+        //handle httpServer error (eg. listen EACCES 0.0.0.0:80 • a.k.a port in use)
+        httpServer.on('error', function(error) {
+            if (!error) {
+                thisNode.status({fill:"red", shape:"ring", text:"unable to start [0] (p:" + port + ")"});
+                return;
+            }
+
+            var errorCode = null;
+            if (error.code)         errorCode = error.code;
+            else if (error.errno)   errorCode = error.errno;
+
+            var errorText = "";
+            if (errorCode)          errorText += errorCode;
+            else                    errorText += "unable to start [1]";
+            errorText += " (p:" + port + ")";
+
+            thisNode.status({fill:"red", shape:"ring", text:errorText});
+            thisNode.error(error);
+        });
+
+        //Start server
         httpServer.listen(port, function(error) {
             if (error) {
-                thisNode.status({fill:"red", shape:"ring", text:"unable to start"});
+                thisNode.status({fill:"red", shape:"ring", text:"unable to start [2] (p:" + port + ")"});
                 console.error(error);
                 return;
             }
