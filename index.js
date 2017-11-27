@@ -1,10 +1,13 @@
+//variables placed here are shared by all nodes
+var storage = require('node-persist');
+
+//this should be a number that does not round nicely when convert to 0-100 range
+const bri_default = 126;
+const bri_step = 25;
+
 module.exports = function(RED) 
 {
-    //variables placed here are shared by all nodes
-    var storage = require('node-persist');
-
-    //this should be a number that does not round nicely when convert to 0-100 range
-    const bri_default = 126;
+    'use strict';
 
     //NodeRED node constructor
     function AlexaLocalNode(config) 
