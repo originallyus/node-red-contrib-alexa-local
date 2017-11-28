@@ -292,11 +292,7 @@ module.exports = function(RED)
 
         //Differentiate between on/off and dimming command. Issue #24
         var isOnOffCommand = (msg.on !== undefined && msg.on !== null) && (msg.bri === undefined || msg.bri === null);
-        if (msg.payload !== undefined && msg.payload === "toggle")
-            isOnOffCommand = true;
         msg.on_off_command = isOnOffCommand;
-
-        console.log(msg);
 
         //Add extra 'payload' parameter which if either "on" or "off"
         var onoff = "off";
@@ -405,22 +401,33 @@ module.exports = function(RED)
 
         var lightId = formatUUID(config.id);
 
+        //Differentiate between on/off and dimming command. Issue #24
+        var isOnOffCommand = false;
+
         var briInput = 0;
         msg.payload = "" + msg.payload;
         msg.payload = msg.payload.trim().toLowerCase();
-        if (msg.payload === "on") {
+        if (msg.payload === "toggle") {
+            isOnOffCommand = true;
+        }
+        else if (msg.payload === "on") {
             msg.payload = "on";
             briInput = 100;
+            isOnOffCommand = true;
         }
         else if (msg.payload === "off") {
             msg.payload = "off";
             briInput = 0;
+            isOnOffCommand = true;
         }
         else {
             briInput = Math.round(parseFloat(msg.payload));
             msg.bri = Math.round(parseFloat(msg.payload) / 100.0 * 255.0);
             msg.payload = (msg.bri > 0) ? "on" : "off";
+            isOnOffCommand = false;
         }
+
+        msg.on_off_command = isOnOffCommand;
 
         //Check if we want to trigger the node
         var inputTrigger = false;
