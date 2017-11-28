@@ -270,7 +270,7 @@ module.exports = function(RED)
     // -----------------------------------------------------------------------------------------------
 
     /*
-     * Handle actual valid request to on/off device
+     * Handle actual valid request to turn on/off device
      */
     function handleAlexaDeviceRequestFunction(request, response, thisNode, config, uuid)
     {
@@ -283,9 +283,13 @@ module.exports = function(RED)
         //Use the json from Alexa as the base for our msg
         var msg = request.data;
 
+        //Differentiate between on/off and dimming command. Issue #24
+        var isOnOffCommand = msg.on !== undefined && msg.on !== null && (msg.bri === undefined || msg.bri === null);
+        msg.on_off_command = isOnOffCommand;
+
         //Add extra 'payload' parameter which if either "on" or "off"
         var onoff = "off";
-        if (request.data.on)
+        if (request.data.on)        //true/false
             onoff = "on";
         msg.payload = onoff;
 

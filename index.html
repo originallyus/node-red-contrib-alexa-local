@@ -79,6 +79,12 @@
         <dd> support for decrease/increase command
              <br/>when decrease/increase command is issued, this parameter is set to -1/1 accordingly; normally it is 0.
         </dd>
+        <dt>on_off_command<span class="property-type">boolean | true/false</span></dt>
+        <dd> indicate whether the command was an on/off command or a dimming/brightness command
+             <br/>eg. Alexa turn on/off light -> true
+             <br/>    Alexa set light to 39% -> false
+             <br/>    Alexa set light to 0% -> false
+        </dd>
         <dt>others...</dt>
         <dd> attach a Debug node for complete msg object to see other parameters available</dd>
     </dl>
