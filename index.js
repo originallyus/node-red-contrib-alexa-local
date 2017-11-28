@@ -83,6 +83,7 @@ module.exports = function(RED)
             if (removed) {
                 clearPortForLightId(lightId);
                 clearLightBriForLightId(lightId);
+                clearLightStateForLightId(lightId);
             }
             httpServer.stop(function(){
                 if (typeof doneFunction === 'function')
@@ -158,7 +159,13 @@ module.exports = function(RED)
 
     function constructOneLightConfig(lightId, deviceName, httpPort)
     {
-        return '{"state": {"on": true, "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
+        var state = getLightStateForLightId(lightId);
+        if (state === undefined || state === null)
+            state = "on";
+        else
+            state = state ? "on" : "off";
+
+        return '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
     }
 
     function constructBridgeSetupXml(lightId, deviceName, httpPort)
@@ -284,8 +291,12 @@ module.exports = function(RED)
         var msg = request.data;
 
         //Differentiate between on/off and dimming command. Issue #24
-        var isOnOffCommand = msg.on !== undefined && msg.on !== null && (msg.bri === undefined || msg.bri === null);
+        var isOnOffCommand = (msg.on !== undefined && msg.on !== null) && (msg.bri === undefined || msg.bri === null);
+        if (msg.payload !== undefined && msg.payload === "toggle")
+            isOnOffCommand = true;
         msg.on_off_command = isOnOffCommand;
+
+        console.log(msg);
 
         //Add extra 'payload' parameter which if either "on" or "off"
         var onoff = "off";
@@ -319,6 +330,13 @@ module.exports = function(RED)
         if (msg.bri && msg.bri == bri_default + 63)     //magic number
             msg.change_direction = 1;
 
+        //Toggle command
+        if (msg.payload === "toggle") {
+            var state = getLightStateForLightId(uuid);
+            var isOn = !state;
+            msg.payload = isOn ? "on" : "off";
+        }
+
         //Dimming or Temperature command
         if (msg.bri) {
             //Save the last value (raw value)
@@ -329,6 +347,9 @@ module.exports = function(RED)
             msg.on = msg.bri > 0;
             msg.payload = msg.on ? "on" : "off";
 
+            //Save the last state value
+            setLightStateForLightId(uuid, msg.on);
+
             //Node status
             thisNode.status({fill:"blue", shape:"dot", text:"bri:" + msg.bri + " (p:" + httpPort + ")"});
         }
@@ -337,6 +358,9 @@ module.exports = function(RED)
             var isOn = (msg.payload == "on")
             msg.bri = isOn ? 100 : 0;
             msg.bri_normalized = isOn ? 1.0 : 0.0;
+
+            //Save the last state value
+            setLightStateForLightId(uuid, isOn);
 
             //Restore the previous value before off command
             var savedBri = getLightBriForLightId(uuid);
@@ -506,4 +530,79 @@ module.exports = function(RED)
             storage.removeItemSync(key);
     }
 
+    /*
+     * Retrieve the 'bri' value used by a given NodeId from persistent storage
+     */
+    function getLightBriForLightId(lightId) 
+    {
+        if (storage === null || storage === undefined)
+            return null;
+        if (lightId === null || lightId === undefined)
+            return null;
+
+        var key = formatUUID(lightId) + "_bri";
+        var value = storage.getItemSync(key);
+        if (value === null || value === undefined || value <= 0 || value >= 65536)
+            return null;
+
+        return value;
+    }
+
+    /*
+     * Save the 'bri' value used by a given NodeId to persistent storage
+     */
+    function setLightBriForLightId(lightId, value) 
+    {
+        var key = formatUUID(lightId) + "_bri";
+        if (storage)
+            storage.setItemSync(key, value);
+    }
+
+    /*
+     * Remove the 'bri' value used by a given NodeId in persistent storage
+     */
+    function clearLightBriForLightId(lightId) 
+    {
+        var key = formatUUID(lightId) + "_bri";
+        if (storage)
+            storage.removeItemSync(key);
+    }
+
+    /*
+     * Retrieve the 'bri' value used by a given NodeId from persistent storage
+     */
+    function getLightStateForLightId(lightId) 
+    {
+        if (storage === null || storage === undefined)
+            return null;
+        if (lightId === null || lightId === undefined)
+            return null;
+
+        var key = formatUUID(lightId) + "_state";
+        var value = storage.getItemSync(key);
+        if (value === null || value === undefined || value <= 0 || value >= 65536)
+            return null;
+
+        return value;
+    }
+
+    /*
+     * Save the 'bri' value used by a given NodeId to persistent storage
+     */
+    function setLightStateForLightId(lightId, value) 
+    {
+        var key = formatUUID(lightId) + "_state";
+        if (storage)
+            storage.setItemSync(key, value);
+    }
+
+    /*
+     * Remove the 'bri' value used by a given NodeId in persistent storage
+     */
+    function clearLightStateForLightId(lightId) 
+    {
+        var key = formatUUID(lightId) + "_state";
+        if (storage)
+            storage.removeItemSync(key);
+    }
 }
