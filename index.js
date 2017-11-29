@@ -161,9 +161,9 @@ module.exports = function(RED)
     {
         var state = getLightStateForLightId(lightId);
         if (state === undefined || state === null)
-            state = "on";
+            state = "true";
         else
-            state = state ? "on" : "off";
+            state = state ? "true" : "false";
 
         return '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
     }
