@@ -165,7 +165,10 @@ module.exports = function(RED)
         else
             state = state ? "true" : "false";
 
-        return '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
+        var fullResponseString = '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
+        RED.log.debug(fullResponseString);
+
+        return fullResponseString;
     }
 
     function constructBridgeSetupXml(lightId, deviceName, httpPort)
@@ -196,8 +199,6 @@ module.exports = function(RED)
      */
     function handleHueApiRequestFunction(request, response, thisNode, config)
     {
-        //console.log(request.method, request.url, request.connection.remoteAddress);
-
         //Node parameters
         var lightId = formatUUID(config.id);
         var deviceName = "";
@@ -210,6 +211,9 @@ module.exports = function(RED)
         var url = request.url;
         var lightMatch = /^\/api\/(\w*)\/lights\/([\w\-]*)/.exec(request.url);
         var authMatch = /^\/api\/(\w*)/.exec(request.url) && (request.method == 'POST');
+
+        //Debug
+        console.log(lightId, deviceName, request.method, request.url, request.connection.remoteAddress);
 
         //Control 1 single light
         if (lightMatch)
@@ -254,7 +258,7 @@ module.exports = function(RED)
         //List all lights
         else if (/^\/api/.exec(request.url)) 
         {
-            //console.log("Sending all lights json to " + request.connection.remoteAddress);
+            console.log("Sending all lights json to " + request.connection.remoteAddress);
             //thisNode.status({fill:"blue", shape:"dot", text:"/lights (p:" + httpPort + ")"});
             var allLightsConfig = constructAllLightsConfig(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/json'});
@@ -264,7 +268,7 @@ module.exports = function(RED)
         //Discovery XML
         else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
-            //console.log("Sending setup.xml to " + request.connection.remoteAddress);
+            console.log("Sending setup.xml to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"discovery (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/xml'});
