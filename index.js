@@ -128,13 +128,15 @@ module.exports = function(RED)
             if (!isValid)
                 return;
 
+            var uuid = formatUUID(config.id);
+
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
             // the corresponding network interface. 
             peer.reply({
                 NT: "urn:schemas-upnp-org:device:basic:1",
-                SERVER: "node.js/0.10.28 UPnP/1.1",
                 ST: "urn:schemas-upnp-org:device:basic:1",
-                USN: "uuid:Socket-1_0-221438K0100073::urn:Belkin:device:**",
+                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+                USN: "uuid:Socket-1_0-" + uuid + "::urn:schemas-upnp-org:device:basic:1",
                 LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml"
             }, address);
         });
