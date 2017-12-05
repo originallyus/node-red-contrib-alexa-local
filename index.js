@@ -177,7 +177,8 @@ module.exports = function(RED)
         var ip = require("ip").address();
 
         //TODO: change this to a dynamic value
-        var bridgeUUID = "710b962e-041c-11e1-9234-0123456789ab";
+        var uuid = formatUUID(lightId);
+        var bridgeUUID = "710b962e-041c-11e1-9234-" + uuid;
 
         //Load setup.xml & replace dynamic values
         var fs = require('fs');
