@@ -260,7 +260,7 @@ module.exports = function(RED)
         else if (/^\/api/.exec(request.url)) 
         {
             console.log("Sending all lights json to " + request.connection.remoteAddress);
-            //thisNode.status({fill:"blue", shape:"dot", text:"/lights (p:" + httpPort + ")"});
+            thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
             var allLightsConfig = constructAllLightsConfig(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/json'});
             response.end(allLightsConfig);
