@@ -124,20 +124,22 @@ module.exports = function(RED)
         });
         peer.on("search", function(headers, address){
             //console.log("SEARCH: ", headers, address);
-            var isValid = headers.ST && headers.MAN=='"ssdp:discover"';
+            var isValid = headers.ST && headers.MAN == '"ssdp:discover"';
             if (!isValid)
                 return;
 
             var uuid = formatUUID(config.id);
+            var hueuuid = formatHueBridgeUUID(config.id);
 
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
             // the corresponding network interface. 
             peer.reply({
-                NT: "urn:schemas-upnp-org:device:basic:1",
                 ST: "urn:schemas-upnp-org:device:basic:1",
                 SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
-                USN: "uuid:Socket-1_0-" + uuid + "::urn:schemas-upnp-org:device:basic:1",
-                LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml"
+                EXT: "",
+                USN: "uuid:" + hueuuid,
+                "hue-bridgeid": uuid,
+                LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml",
             }, address);
         });
         peer.on("found",function(headers, address){
@@ -180,7 +182,7 @@ module.exports = function(RED)
 
         //Unique UUID for each bridge device
         var uuid = formatUUID(lightId);
-        var bridgeUUID = "710b962e-041c-11e1-9234-" + uuid;
+        var bridgeUUID = formatHueBridgeUUID(lightId);
 
         //Load setup.xml & replace dynamic values
         var fs = require('fs');
@@ -459,13 +461,22 @@ module.exports = function(RED)
     /*
      * We use NodeRED's Node ID as the UUID for Alexa device, with some tweaking
      */
-    function formatUUID(lightId) 
+    function formatUUID(lightId)
     {
         if (lightId === null || lightId === undefined)
             return "";
 
         var string = ("" + lightId);
         return string.replace(".", "").trim();
+    }
+
+    function formatHueBridgeUUID(lightId)
+    {
+        if (lightId === null || lightId === undefined)
+            return "";
+        var uuid = "f6543a06-da50-11ba-8d8f-";
+        uuid += formatUUID(lightId);
+        return uuid;  // f6543a06-da50-11ba-8d8f-5ccf7f139f3d
     }
 
     /*
