@@ -6,7 +6,7 @@
 </specVersion>
 <URLBase>http://IP_ADDRESS_WITH_PORT/</URLBase>
 <device>
-<deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>
+<deviceType>urn:schemas-upnp-org:device:basic:1</deviceType>
 <friendlyName>Amazon-Echo-NodeRed-Bridge</friendlyName>
 <manufacturer>Royal Philips Electronics</manufacturer>
 <manufacturerURL>http://originally.us</manufacturerURL>
