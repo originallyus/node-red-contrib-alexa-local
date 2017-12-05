@@ -150,22 +150,22 @@ module.exports = function(RED)
     // XML
     // -----------------------------------------------------------------------------------------------
 
-    function constructAllLightsConfig(lightId, deviceName, httpPort)
+    function constructAllLightsConfig(uuid, deviceName, httpPort)
     {
-        return '{ "lights": { "' + lightId + '": ' 
-            + constructOneLightConfig(lightId, deviceName, httpPort) 
+        return '{ "lights": { "' + uuid + '": ' 
+            + constructOneLightConfig(uuid, deviceName, httpPort) 
             + '} }';
     }
 
-    function constructOneLightConfig(lightId, deviceName, httpPort)
+    function constructOneLightConfig(uuid, deviceName, httpPort)
     {
-        var state = getLightStateForLightId(lightId);
+        var state = getLightStateForLightId(uuid);
         if (state === undefined || state === null)
             state = "true";
         else
             state = state ? "true" : "false";
 
-        var fullResponseString = '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + lightId + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
+        var fullResponseString = '{"state": {"on": ' + state + ', "bri": ' + bri_default + ', "hue": 15823, "sat": 88, "effect": "none", "ct": 313, "alert": "none", "colormode": "ct", "ct": 365, "reachable": true, "xy": [0.4255, 0.3998]}, "type": "Extended color light", "name": "' + deviceName + '", "modelid": "LCT004", "manufacturername": "Philips", "uniqueid": "' + uuid + '", "swversion": "65003148", "pointsymbol": {"1": "none", "2": "none", "3": "none", "4": "none", "5": "none", "6": "none", "7": "none", "8": "none"}}';
         RED.log.debug(fullResponseString);
 
         return fullResponseString;
@@ -176,7 +176,7 @@ module.exports = function(RED)
         //IP Address of this local machine
         var ip = require("ip").address();
 
-        //TODO: change this to a dynamic value
+        //Unique UUID for each bridge device
         var uuid = formatUUID(lightId);
         var bridgeUUID = "710b962e-041c-11e1-9234-" + uuid;
 
