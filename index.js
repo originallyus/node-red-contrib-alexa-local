@@ -16,7 +16,7 @@ module.exports = function(RED)
         var thisNode = this;
 
         //Initialize persist storage
-        storage.initSync({dir: 'nodered/alexa-local/persist'});
+        storage.initSync({dir: `${RED.settings.userDir}/alexa-local/persist`});
 
         //Restore saved port number, if any
         //port == 0 when not available -> any available port (first time)
