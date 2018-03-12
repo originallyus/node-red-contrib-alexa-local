@@ -218,7 +218,7 @@ module.exports = function(RED)
         var authMatch = /^\/api\/(\w*)/.exec(request.url) && (request.method == 'POST');
 
         //Debug
-        console.log(lightId, deviceName, request.method, request.url, request.connection.remoteAddress);
+        RED.log.debug(lightId + ' ' + deviceName + ' ' + request.method + ' ' + request.url + ' ' + request.connection.remoteAddress)
 
         //Control 1 single light
         if (lightMatch)
@@ -273,7 +273,7 @@ module.exports = function(RED)
         //Discovery XML
         else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
-            console.log("Sending setup.xml to " + request.connection.remoteAddress);
+            RED.log.debug("Sending setup.xml to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"discovery (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/xml'});
