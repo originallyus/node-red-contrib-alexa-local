@@ -123,13 +123,12 @@ module.exports = function(RED)
         peer.on("notify", function(headers, address){
         });
         peer.on("search", function(headers, address){
-            //console.log("SEARCH: ", headers, address);
             var isValid = headers.ST && headers.MAN == '"ssdp:discover"';
             if (!isValid)
                 return;
 
             var uuid = formatUUID(config.id);
-            var hueuuid = formatHueBridgeUUID(config.id);
+            var hueuUuid = formatHueBridgeUUID(config.id);
 
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
             // the corresponding network interface. 
@@ -138,7 +137,7 @@ module.exports = function(RED)
                                 ST: "urn:schemas-upnp-org:device:basic:1",
                                 SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
                                 EXT: "",
-                                USN: "uuid:" + hueuuid,
+                                USN: "uuid:" + hueuUuid,
                                 "hue-bridgeid": uuid,
                                 LOCATION: xmlLocation,
                               };
