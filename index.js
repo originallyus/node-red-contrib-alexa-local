@@ -218,7 +218,7 @@ module.exports = function(RED)
         var authMatch = /^\/api\/(\w*)/.exec(request.url) && (request.method == 'POST');
 
         //Debug
-        console.log(lightId, deviceName, request.method, request.url, request.connection.remoteAddress);
+        RED.log.debug(lightId + ' ' + deviceName + ' ' + request.method + ' ' + request.url + ' ' + request.connection.remoteAddress)
 
         //Control 1 single light
         if (lightMatch)
