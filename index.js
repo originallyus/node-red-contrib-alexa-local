@@ -318,8 +318,16 @@ module.exports = function(RED)
 
         justDoIt(thisNode, config, uuid, msg);
 
+        //Retrieve the last known state
+        var state = getLightStateForLightId(uuid);
+        console.log("State: " + state);
+        if (state === undefined || state === null)
+            state = "true";
+        else
+            state = state ? "true" : "false";
+
         //Response to Alexa
-        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":true}}]';
+        var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":' + state + '}}]';
         console.log("Sending response to " + request.connection.remoteAddress, responseStr);
         response.writeHead(200, "OK", {'Content-Type': 'application/json'});
         response.end(responseStr);
