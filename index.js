@@ -133,14 +133,22 @@ module.exports = function(RED)
 
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
             // the corresponding network interface. 
-            peer.reply({
-                ST: "urn:schemas-upnp-org:device:basic:1",
-                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
-                EXT: "",
-                USN: "uuid:" + hueuuid,
-                "hue-bridgeid": uuid,
-                LOCATION: "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml",
-            }, address);
+            var xmlLocation = "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml";
+            var responseObj = {
+                                ST: "urn:schemas-upnp-org:device:basic:1",
+                                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+                                EXT: "",
+                                USN: "uuid:" + hueuuid,
+                                "hue-bridgeid": uuid,
+                                LOCATION: xmlLocation,
+                              };
+                              
+            //Timing fix for Echo Dot Gen 2
+            //https://github.com/bwssytems/ha-bridge/issues/860
+            setTimeout(function() {
+                peer.reply(responseObj, address);
+            }, 1500);
+
         });
         peer.on("found",function(headers, address){
         });
