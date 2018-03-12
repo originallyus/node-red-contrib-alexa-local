@@ -273,7 +273,7 @@ module.exports = function(RED)
         //Discovery XML
         else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
-            console.log("Sending setup.xml to " + request.connection.remoteAddress);
+            RED.log.debug("Sending setup.xml to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"discovery (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/xml'});
