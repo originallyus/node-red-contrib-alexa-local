@@ -133,20 +133,53 @@ module.exports = function(RED)
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
             // the corresponding network interface. 
             var xmlLocation = "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml";
-            var responseObj = {
-                                ST: "urn:schemas-upnp-org:device:basic:1",
-                                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+
+            // Response with 3 different templates
+            // https://github.com/bwssytems/ha-bridge/blob/master/src/main/java/com/bwssystems/HABridge/upnp/UpnpListener.java
+            var responseObj1 = {
+                                HOST: "239.255.255.250:1900",
+                                "CACHE-CONTROL": "max-age=100",
                                 EXT: "",
-                                USN: "uuid:" + hueuUuid,
-                                "hue-bridgeid": uuid,
                                 LOCATION: xmlLocation,
+                                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+                                "hue-bridgeid": uuid,
+                                ST: "upnp:rootdevice",
+                                USN: "uuid:" + hueuUuid
                               };
-                              
-            //Timing fix for Echo Dot Gen 2
+            var responseObj2 = {
+                                HOST: "239.255.255.250:1900",
+                                "CACHE-CONTROL": "max-age=100",
+                                EXT: "",
+                                LOCATION: xmlLocation,
+                                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+                                "hue-bridgeid": uuid,
+                                ST: "uuid:" + hueuUuid,
+                                USN: "uuid:" + hueuUuid
+                              };
+            var responseObj3 = {
+                                HOST: "239.255.255.250:1900",
+                                "CACHE-CONTROL": "max-age=100",
+                                EXT: "",
+                                LOCATION: xmlLocation,
+                                SERVER: "Linux/3.14.0 UPnP/1.0 IpBridge/1.17.0",
+                                "hue-bridgeid": uuid,
+                                ST: "urn:schemas-upnp-org:device:basic:1",
+                                USN: "uuid:" + hueuUuid
+                              };
+
+            //Delay: timing fix for Echo Dot Gen 2
             //https://github.com/bwssytems/ha-bridge/issues/860
             setTimeout(function() {
-                peer.reply(responseObj, address);
-            }, 1500);
+                peer.reply(responseObj1, address);
+            }, 650*1);
+
+            setTimeout(function() {
+                peer.reply(responseObj2, address);
+            }, 650*2);
+
+            setTimeout(function() {
+                peer.reply(responseObj3, address);
+            }, 650*3);
 
         });
         peer.on("found",function(headers, address){
