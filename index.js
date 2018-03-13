@@ -56,7 +56,7 @@ module.exports = function(RED)
         httpServer.listen(port, function(error) {
             if (error) {
                 thisNode.status({fill:"red", shape:"ring", text:"unable to start [2] (p:" + port + ")"});
-                console.error(error);
+                RED.log.error(error);
                 return;
             }
 
@@ -88,7 +88,7 @@ module.exports = function(RED)
             httpServer.stop(function(){
                 if (typeof doneFunction === 'function')
                     doneFunction();
-                console.log("AlexaLocalNode closing done...");
+                RED.log.info("AlexaLocalNode closing done...");
             });
             setImmediate(function(){
                 httpServer.emit('close');
@@ -112,7 +112,7 @@ module.exports = function(RED)
         if (port === null || port === undefined || port <= 0 || port >= 65536) {
             var errorMsg = "port is in valid (" + port + ")";
             thisNode.status({fill:"red", shape:"ring", text:errorMsg});
-            console.error(errorMsg);
+            RED.log.error(errorMsg);
             return;
         }
 
@@ -238,7 +238,7 @@ module.exports = function(RED)
             if (request.method == 'PUT')
             {
                 request.on('data', function(chunk) {
-                    console.log("Receiving PUT data ", chunk.toString());
+                    RED.log.debug("Receiving PUT data " + chunk.toString());
                     request.data = JSON.parse(chunk);
                 });
                 request.on('end', function() {
@@ -247,7 +247,7 @@ module.exports = function(RED)
             } 
             //GET 1 single light info
             else {
-                console.log("Sending light " + uuid + " to " + request.connection.remoteAddress);
+                RED.log.debug("Sending light " + uuid + " to " + request.connection.remoteAddress);
                 var lightJson = constructOneLightConfig(uuid, deviceName, httpPort);
                 response.writeHead(200, {'Content-Type': 'application/json'});
                 response.end(lightJson);
@@ -261,7 +261,7 @@ module.exports = function(RED)
             var responseStr = '[{"success":{"username":"' + HUE_USERNAME + '"}}]';
 
             //Response to Hue app
-            console.log("Sending response to " + request.connection.remoteAddress, responseStr);
+            RED.log.debug("Sending response to " + request.connection.remoteAddress, responseStr);
             thisNode.status({fill:"blue", shape:"dot", text:"auth" + " (p:" + httpPort + ")"});
             response.writeHead(200, "OK", {'Content-Type': 'application/json'});
             response.end(responseStr);
@@ -270,7 +270,7 @@ module.exports = function(RED)
         //List all lights
         else if (/^\/api/.exec(request.url)) 
         {
-            console.log("Sending all lights json to " + request.connection.remoteAddress);
+            RED.log.debug("Sending all lights json to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
             var allLightsConfig = constructAllLightsConfig(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/json'});
@@ -320,7 +320,7 @@ module.exports = function(RED)
 
         //Retrieve the last known state
         var state = getLightStateForLightId(uuid);
-        console.log("State: " + state);
+        RED.log.debug("State: " + state);
         if (state === undefined || state === null)
             state = "true";
         else
@@ -328,7 +328,7 @@ module.exports = function(RED)
 
         //Response to Alexa
         var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":' + state + '}}]';
-        console.log("Sending response to " + request.connection.remoteAddress, responseStr);
+        RED.log.debug("Sending response to " + request.connection.remoteAddress, responseStr);
         response.writeHead(200, "OK", {'Content-Type': 'application/json'});
         response.end(responseStr);
     }
@@ -613,15 +613,21 @@ module.exports = function(RED)
      */
     function getLightStateForLightId(lightId) 
     {
-        if (storage === null || storage === undefined)
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in getLightStateForLightId");
             return null;
-        if (lightId === null || lightId === undefined)
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
             return null;
+        }
 
         var key = formatUUID(lightId) + "_state";
         var value = storage.getItemSync(key);
-        if (value === null || value === undefined || value <= 0 || value >= 65536)
+        if (value === null || value === undefined || value <= 0 || value >= 65536) {
+            RED.log.warn("light state is null in storage");
             return null;
+        }
 
         return value;
     }
@@ -631,6 +637,15 @@ module.exports = function(RED)
      */
     function setLightStateForLightId(lightId, value) 
     {
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in setLightStateForLightId");
+            return;
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
+            return null;
+        }
+
         var key = formatUUID(lightId) + "_state";
         if (storage)
             storage.setItemSync(key, value);
@@ -641,6 +656,15 @@ module.exports = function(RED)
      */
     function clearLightStateForLightId(lightId) 
     {
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in clearLightStateForLightId");
+            return;
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
+            return null;
+        }
+
         var key = formatUUID(lightId) + "_state";
         if (storage)
             storage.removeItemSync(key);
