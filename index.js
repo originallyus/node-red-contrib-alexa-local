@@ -537,15 +537,21 @@ module.exports = function(RED)
      */
     function getLightBriForLightId(lightId) 
     {
-        if (storage === null || storage === undefined)
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in getLightBriForLightId");
             return null;
-        if (lightId === null || lightId === undefined)
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
             return null;
+        }
 
         var key = formatUUID(lightId) + "_bri";
         var value = storage.getItemSync(key);
-        if (value === null || value === undefined || value <= 0 || value >= 65536)
+        if (value === null || value === undefined || value < 0 || value >= 65536) {
+            RED.log.warn("light state is null in storage");
             return null;
+        }
 
         return value;
     }
@@ -555,9 +561,17 @@ module.exports = function(RED)
      */
     function setLightBriForLightId(lightId, value) 
     {
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in setLightBriForLightId");
+            return null;
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
+            return null;
+        }
+
         var key = formatUUID(lightId) + "_bri";
-        if (storage)
-            storage.setItemSync(key, value);
+        storage.setItemSync(key, value);
     }
 
     /*
@@ -565,9 +579,17 @@ module.exports = function(RED)
      */
     function clearLightBriForLightId(lightId) 
     {
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in clearLightBriForLightId");
+            return null;
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
+            return null;
+        }
+
         var key = formatUUID(lightId) + "_bri";
-        if (storage)
-            storage.removeItemSync(key);
+        storage.removeItemSync(key);
     }
 
     /*
@@ -575,15 +597,21 @@ module.exports = function(RED)
      */
     function getLightBriForLightId(lightId) 
     {
-        if (storage === null || storage === undefined)
+        if (storage === null || storage === undefined) {
+            RED.log.warn("storage is null in getLightBriForLightId");
             return null;
-        if (lightId === null || lightId === undefined)
+        }
+        if (lightId === null || lightId === undefined) {
+            RED.log.warn("lightId is null");
             return null;
+        }
 
         var key = formatUUID(lightId) + "_bri";
         var value = storage.getItemSync(key);
-        if (value === null || value === undefined || value <= 0 || value >= 65536)
+        if (value === null || value === undefined || value < 0 || value >= 65536) {
+            RED.log.warn("light bri is null in storage");
             return null;
+        }
 
         return value;
     }
