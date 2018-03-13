@@ -647,8 +647,7 @@ module.exports = function(RED)
         }
 
         var key = formatUUID(lightId) + "_state";
-        if (storage)
-            storage.setItemSync(key, value);
+        storage.setItemSync(key, value);
     }
 
     /*
@@ -666,7 +665,6 @@ module.exports = function(RED)
         }
 
         var key = formatUUID(lightId) + "_state";
-        if (storage)
-            storage.removeItemSync(key);
+        storage.removeItemSync(key);
     }
 }
