@@ -444,9 +444,36 @@ module.exports = function(RED)
             briInput = 0;
             isOnOffCommand = true;
         }
+        else if (msg.payload.startsWith("+") || msg.payload.startsWith("-")) {
+            var delta100 = Math.round(parseFloat(msg.payload));                 //given by user in 0-100 range
+            var delta255 = Math.round(delta100 / 100.0 * 255.0)
+            var currentBri = getLightBriForLightId(lightId);
+            briInput = Math.round((currentBri + delta255) / 255.0 * 100.0);
+            briInput = Math.min(100, Math.max(briInput, 0));                    //limit 0-100 range
+            msg.bri = Math.round(parseFloat(briInput) / 100.0 * 255.0);         //mapping 0-100 to 0-255 scale
+            msg.payload = (msg.bri > 0) ? "on" : "off";
+            isOnOffCommand = false;
+        }
+        else if (msg.payload === "increase" || msg.payload === "brighter") {
+            var currentBri = getLightBriForLightId(lightId);
+            briInput = Math.round((currentBri + 63) / 255.0 * 100.0);
+            briInput = Math.min(100, Math.max(briInput, 0));                    //limit 0-100 range
+            msg.bri = Math.round(parseFloat(briInput) / 100.0 * 255.0);         //mapping 0-100 to 0-255 scale
+            msg.payload = (msg.bri > 0) ? "on" : "off";
+            isOnOffCommand = false;
+        }
+        else if (msg.payload === "decrease" || msg.payload === "dimmer") {
+            var currentBri = getLightBriForLightId(lightId);
+            briInput = Math.round((currentBri - 64) / 255.0 * 100.0);           //mapping 0-255 to 0-100 scale
+            briInput = Math.min(100, Math.max(briInput, 0));                    //limit 0-100 range
+            msg.bri = Math.round(parseFloat(briInput) / 100.0 * 255.0);         //mapping 0-100 to 0-255 scale
+            msg.payload = (msg.bri > 0) ? "on" : "off";
+            isOnOffCommand = false;
+        }
         else {
             briInput = Math.round(parseFloat(msg.payload));
-            msg.bri = Math.round(parseFloat(msg.payload) / 100.0 * 255.0);
+            briInput = Math.min(100, Math.max(briInput, 0));                    //limit 0-100 range
+            msg.bri = Math.round(parseFloat(msg.payload) / 100.0 * 255.0);      //mapping 0-100 to 0-255 scale
             msg.payload = (msg.bri > 0) ? "on" : "off";
             isOnOffCommand = false;
         }
