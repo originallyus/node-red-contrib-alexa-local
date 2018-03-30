@@ -171,15 +171,15 @@ module.exports = function(RED)
             //https://github.com/bwssytems/ha-bridge/issues/860
             setTimeout(function() {
                 peer.reply(responseObj1, address);
-            }, 650*1);
+            }, 1500 + 100*1);
 
             setTimeout(function() {
                 peer.reply(responseObj2, address);
-            }, 650*2);
+            }, 1500 + 100*2);
 
             setTimeout(function() {
                 peer.reply(responseObj3, address);
-            }, 650*3);
+            }, 1500 + 100*3);
 
         });
         peer.on("found",function(headers, address){
