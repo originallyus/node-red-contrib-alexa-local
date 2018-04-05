@@ -22,7 +22,7 @@ or
 Change your working directory to your node red installation. Usually it's in ~/.node-red.
 
     $ npm install node-red-contrib-alexa-local
-    
+
 ## How to use
   * Add this node to your flow
   * Give it a unique **Device Name**
@@ -32,11 +32,15 @@ Change your working directory to your node red installation. Usually it's in ~/.
 ![Usage screenshot](https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot3.png "Screenshot")
 
 
+## Known issues
+  * Doesn't support Echo Gen 2 & Echo Plus discovery yet
+  * Echo Show, Echo Spot, Sonos One does not have the capability to discovery devices locally
+
 ## FAQ
-**Does is support German or other languages?**
+**Does it support German or other languages?**
 Yes! As long as Alexa supports that language.
 
-**Does is support door lock/curtain/AV/TV or other types of devices?**
+**Does it support door lock/curtain/AV/TV or other types of devices?**
 Unfortunately no. In order to keep this node so simple to use, it was designed to emulate a Philips Hue bridge & device within local network. Amazon Echo is hardcoded to support only on/off/dimming command via this route. Any other type of support has to go through the Alexa Skills route (cloud-based). There is another node does just that [node-red-contrib-alexa-home-skill](https://github.com/hardillb/node-red-contrib-alexa-home-skill)
 
 **Example dimming commands**
@@ -59,5 +63,5 @@ Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.origin
 
 
 ## TODO
-  * Emulate using 1 bridge per 25 devices instead of 1 bridge per device
   * Alexa isolation
+  * Support Echo Gen 2 & Echo Plus discovery
