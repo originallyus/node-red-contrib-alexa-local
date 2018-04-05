@@ -33,8 +33,8 @@ Change your working directory to your node red installation. Usually it's in ~/.
 
 
 ## Known issues
-  * Doesn't support Echo Gen 2 & Echo Plus discovery yet
-  * Echo Show, Echo Spot, Sonos One does not have the capability to discovery devices locally
+  * Doesn't support Echo Gen 2 & Echo Plus local devices discovery yet
+  * Echo Show, Echo Spot, Sonos One do not have the capability to discovery devices locally
 
 ## FAQ
 **Does it support German or other languages?**
