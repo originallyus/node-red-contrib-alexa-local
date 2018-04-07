@@ -296,7 +296,7 @@ module.exports = function(RED)
             //Response to Hue app
             RED.log.debug("Sending response to " + request.connection.remoteAddress, responseStr);
             thisNode.status({fill:"blue", shape:"dot", text:"auth" + " (p:" + httpPort + ")"});
-            response.writeHead(200, "OK", {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
+            response.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
             response.end(responseStr);
         }
 
