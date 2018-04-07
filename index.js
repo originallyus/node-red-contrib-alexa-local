@@ -609,7 +609,7 @@ module.exports = function(RED)
         var key = formatUUID(lightId) + "_bri";
         var value = storage.getItemSync(key);
         if (value === null || value === undefined || value < 0 || value >= 65536) {
-            RED.log.warn("light state is null in storage");
+            //RED.log.warn("light bri is null in storage");
             return null;
         }
 
@@ -713,7 +713,7 @@ module.exports = function(RED)
         var key = formatUUID(lightId) + "_state";
         var value = storage.getItemSync(key);
         if (value === null || value === undefined || value < 0 || value >= 65536) {
-            RED.log.warn("light state is null in storage");
+            //RED.log.warn("light state is null in storage");
             return null;
         }
 
