@@ -282,7 +282,7 @@ module.exports = function(RED)
             else {
                 RED.log.debug("Sending light " + uuid + " to " + request.connection.remoteAddress);
                 var lightJson = constructOneLightConfig(uuid, deviceName, httpPort);
-                response.writeHead(200, {'Content-Type': 'application/json'});
+                response.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
                 response.end(lightJson);
             }
         }
@@ -296,7 +296,7 @@ module.exports = function(RED)
             //Response to Hue app
             RED.log.debug("Sending response to " + request.connection.remoteAddress, responseStr);
             thisNode.status({fill:"blue", shape:"dot", text:"auth" + " (p:" + httpPort + ")"});
-            response.writeHead(200, "OK", {'Content-Type': 'application/json'});
+            response.writeHead(200, "OK", {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
             response.end(responseStr);
         }
 
@@ -306,7 +306,7 @@ module.exports = function(RED)
             RED.log.debug("Sending all lights json to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
             var allLightsConfig = constructAllLightsConfig(lightId, deviceName, httpPort);
-            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
             response.end(allLightsConfig);
         }
 
@@ -316,7 +316,7 @@ module.exports = function(RED)
             RED.log.debug("Sending setup.xml to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"discovery (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
-            response.writeHead(200, {'Content-Type': 'application/xml'});
+            response.writeHead(200, {'Content-Type': 'application/xml', 'Access-Control-Allow-Origin': '*'});
             response.end(rawXml);    
         }
     }
