@@ -362,7 +362,7 @@ module.exports = function(RED)
         //Response to Alexa
         var responseStr = '[{"success":{"/lights/' + uuid + '/state/on":' + state + '}}]';
         RED.log.debug("Sending response to " + request.connection.remoteAddress, responseStr);
-        response.writeHead(200, "OK", {'Content-Type': 'application/json'});
+        response.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
         response.end(responseStr);
     }
 
