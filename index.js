@@ -338,6 +338,7 @@ module.exports = function(RED)
 
         //Use the json from Alexa as the base for our msg
         var msg = request.data;
+        msg.from = request.connection.remoteAddress;
 
         //Differentiate between on/off and dimming command. Issue #24
         var isOnOffCommand = (msg.on !== undefined && msg.on !== null) && (msg.bri === undefined || msg.bri === null);
