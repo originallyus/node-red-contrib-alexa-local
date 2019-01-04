@@ -5,12 +5,12 @@ var storage = require('node-persist');
 const bri_default = 126;
 const bri_step = 25;
 
-module.exports = function(RED)
+module.exports = function(RED) 
 {
     'use strict';
 
     //NodeRED node constructor
-    function AlexaLocalNode(config)
+    function AlexaLocalNode(config) 
     {
         RED.nodes.createNode(this, config);
         var thisNode = this;
@@ -20,10 +20,8 @@ module.exports = function(RED)
 
         //Restore saved port number, if any
         //port == 0 when not available -> any available port (first time)
-        // var lightId = formatUUID(config.id);
-        // var port = getPortForLightId(lightId);
-        // Use of port 80 required by Amazon Echo Dot (3rd Generation)
-        port = 80;
+        var lightId = formatUUID(config.id);
+        var port = getPortForLightId(lightId);
 
         //HTTP Server to host the Hue API
         //We use stoppable to kill the server completely upon a deploy
@@ -71,7 +69,7 @@ module.exports = function(RED)
             config.port = actualPort;
             thisNode.status({fill:"green", shape:"dot", text:"online (p:" + actualPort + ")"});
 
-            //Start discovery service after we know the port number
+            //Start discovery service after we know the port number            
             startSSDP(thisNode, actualPort, config);
         });
 
@@ -133,7 +131,7 @@ module.exports = function(RED)
             var hueuUuid = formatHueBridgeUUID(config.id);
 
             // {{networkInterfaceAddress}} will be replaced with the actual IP Address of
-            // the corresponding network interface.
+            // the corresponding network interface. 
             var xmlLocation = "http://{{networkInterfaceAddress}}:" + port + "/upnp/amazon-ha-bridge/setup.xml";
 
             // Response with 3 different templates
@@ -198,9 +196,9 @@ module.exports = function(RED)
 
     function constructAllLightsConfig(uuid, deviceName, httpPort)
     {
-        return '{ "' + uuid + '": '
-          + constructOneLightConfig(uuid, deviceName, httpPort)
-          + '}';
+        return '{ "lights": { "' + uuid + '": ' 
+            + constructOneLightConfig(uuid, deviceName, httpPort) 
+            + '} }';
     }
 
     function constructOneLightConfig(uuid, deviceName, httpPort)
@@ -257,7 +255,7 @@ module.exports = function(RED)
 
         var url = request.url;
         var lightMatch = /^\/api\/(\w*)\/lights\/([\w\-]*)/.exec(request.url);
-        var authMatch = /^\/api/.exec(request.url) && (request.method == 'POST');
+        var authMatch = /^\/api\/(\w*)/.exec(request.url) && (request.method == 'POST');
 
         //Debug
         RED.log.debug(lightId + ' ' + deviceName + ' ' + request.method + ' ' + request.url + ' ' + request.connection.remoteAddress)
@@ -279,7 +277,7 @@ module.exports = function(RED)
                 request.on('end', function() {
                     handleAlexaDeviceRequestFunction(request, response, thisNode, config, uuid);
                 });
-            }
+            } 
             //GET 1 single light info
             else {
                 RED.log.debug("Sending light " + uuid + " to " + request.connection.remoteAddress);
@@ -290,7 +288,7 @@ module.exports = function(RED)
         }
 
         //Authorization step (press button on Hue Bridge)
-        else if (authMatch)
+        else if (authMatch) 
         {
             const HUE_USERNAME = "1028d66426293e821ecfd9ef1a0731df";
             var responseStr = '[{"success":{"username":"' + HUE_USERNAME + '"}}]';
@@ -303,7 +301,7 @@ module.exports = function(RED)
         }
 
         //List all lights
-        else if (/^\/api/.exec(request.url))
+        else if (/^\/api/.exec(request.url)) 
         {
             RED.log.debug("Sending all lights json to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"/lights (p:" + httpPort + ")"});
@@ -313,13 +311,13 @@ module.exports = function(RED)
         }
 
         //Discovery XML
-        else if (request.url == '/upnp/amazon-ha-bridge/setup.xml')
+        else if (request.url == '/upnp/amazon-ha-bridge/setup.xml') 
         {
             RED.log.debug("Sending setup.xml to " + request.connection.remoteAddress);
             thisNode.status({fill:"yellow", shape:"dot", text:"discovery (p:" + httpPort + ")"});
             var rawXml = constructBridgeSetupXml(lightId, deviceName, httpPort);
             response.writeHead(200, {'Content-Type': 'application/xml', 'Access-Control-Allow-Origin': '*'});
-            response.end(rawXml);
+            response.end(rawXml);    
         }
     }
 
@@ -560,7 +558,7 @@ module.exports = function(RED)
     /*
      * Retrieve the port number used by a given NodeId from persistent storage
      */
-    function getPortForLightId(lightId)
+    function getPortForLightId(lightId) 
     {
         if (storage === null || storage === undefined)
             return 0;
@@ -578,7 +576,7 @@ module.exports = function(RED)
     /*
      * Save the port number used by a given NodeId to persistent storage
      */
-    function setPortForLightId(lightId, value)
+    function setPortForLightId(lightId, value) 
     {
         var key = formatUUID(lightId);
         if (storage)
@@ -588,7 +586,7 @@ module.exports = function(RED)
     /*
      * Remove the port number used by a given NodeId in persistent storage
      */
-    function clearPortForLightId(lightId)
+    function clearPortForLightId(lightId) 
     {
         var key = formatUUID(lightId);
         if (storage)
@@ -598,7 +596,7 @@ module.exports = function(RED)
     /*
      * Retrieve the 'bri' value used by a given NodeId from persistent storage
      */
-    function getLightBriForLightId(lightId)
+    function getLightBriForLightId(lightId) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in getLightBriForLightId");
@@ -622,7 +620,7 @@ module.exports = function(RED)
     /*
      * Save the 'bri' value used by a given NodeId to persistent storage
      */
-    function setLightBriForLightId(lightId, value)
+    function setLightBriForLightId(lightId, value) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in setLightBriForLightId");
@@ -640,7 +638,7 @@ module.exports = function(RED)
     /*
      * Remove the 'bri' value used by a given NodeId in persistent storage
      */
-    function clearLightBriForLightId(lightId)
+    function clearLightBriForLightId(lightId) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in clearLightBriForLightId");
@@ -658,7 +656,7 @@ module.exports = function(RED)
     /*
      * Retrieve the 'bri' value used by a given NodeId from persistent storage
      */
-    function getLightBriForLightId(lightId)
+    function getLightBriForLightId(lightId) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in getLightBriForLightId");
@@ -682,7 +680,7 @@ module.exports = function(RED)
     /*
      * Save the 'bri' value used by a given NodeId to persistent storage
      */
-    function setLightBriForLightId(lightId, value)
+    function setLightBriForLightId(lightId, value) 
     {
         var key = formatUUID(lightId) + "_bri";
         if (storage)
@@ -692,7 +690,7 @@ module.exports = function(RED)
     /*
      * Remove the 'bri' value used by a given NodeId in persistent storage
      */
-    function clearLightBriForLightId(lightId)
+    function clearLightBriForLightId(lightId) 
     {
         var key = formatUUID(lightId) + "_bri";
         if (storage)
@@ -702,7 +700,7 @@ module.exports = function(RED)
     /*
      * Retrieve the 'bri' value used by a given NodeId from persistent storage
      */
-    function getLightStateForLightId(lightId)
+    function getLightStateForLightId(lightId) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in getLightStateForLightId");
@@ -726,7 +724,7 @@ module.exports = function(RED)
     /*
      * Save the 'bri' value used by a given NodeId to persistent storage
      */
-    function setLightStateForLightId(lightId, value)
+    function setLightStateForLightId(lightId, value) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in setLightStateForLightId");
@@ -744,7 +742,7 @@ module.exports = function(RED)
     /*
      * Remove the 'bri' value used by a given NodeId in persistent storage
      */
-    function clearLightStateForLightId(lightId)
+    function clearLightStateForLightId(lightId) 
     {
         if (storage === null || storage === undefined) {
             RED.log.warn("storage is null in clearLightStateForLightId");
