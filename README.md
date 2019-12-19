@@ -124,8 +124,3 @@ Please create an issue in [Github](https://github.com/originallyus/node-red-cont
 
 **How do I control my (non-smart) devices at home with NodeRED?**
 Check out [RMPlugin app](https://play.google.com/store/apps/details?id=us.originally.tasker&hl=en) developed by us. Here's an [intro video](https://www.youtube.com/watch?v=QUKYKhK57sc) for the hardware.
-
-
-## TODO
-  * Alexa isolation
-  * Support Echo Gen 2 & Echo Plus discovery
