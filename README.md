@@ -1,7 +1,9 @@
 # node-red-contrib-alexa-local
 ## THIS NODE IS NO LONGER WORKING
 **TL;DR;**
-Please replace my node with [node-red-contrib-amazon-echo]https://flows.nodered.org/node/node-red-contrib-amazon-echo
+
+Please replace my node with [node-red-contrib-amazon-echo](https://flows.nodered.org/node/node-red-contrib-amazon-echo)
+
 
 **Detailed explainations:**
 • My nodes is no longer working with any Alexa devices after recent Alexa firmware (auto) updates.
