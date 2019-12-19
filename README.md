@@ -1,3 +1,4 @@
+# node-red-contrib-alexa-local
 ## THIS NODE IS NO LONGER WORKING
 ## TL;DR;
 Please replace my node with [node-red-contrib-amazon-echo]
@@ -17,20 +18,20 @@ OR
 
 This hassle is exactly why I have designed my node to run on random ports, pretty newbie-proof for most users & did not change the implementation for newer generation of Alexa devices.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
 
 # node-red-contrib-alexa-local
 
