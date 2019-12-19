@@ -4,11 +4,12 @@
 
 **TL;DR;**
 
-Please replace my node with [node-red-contrib-amazon-echo](https://flows.nodered.org/node/node-red-contrib-amazon-echo)
+Please replace this node with [node-red-contrib-amazon-echo](https://flows.nodered.org/node/node-red-contrib-amazon-echo)
 
 
 **Detailed explainations:**
-• My nodes is no longer working with any Alexa devices after recent Alexa firmware (auto) updates.
+
+• This nodes is no longer working with any Alexa devices after recent Alexa firmware (auto) updates.
 
 • The reason is discovery procedure needs to be hosted on port 80 of your NodeRed.
 
@@ -18,6 +19,7 @@ Please replace my node with [node-red-contrib-amazon-echo](https://flows.nodered
 
 
 **VERY IMPORTANT NOTE:**
+
 • You probably need to restart the system after replacing my nodes to clear them from the system.
 
 • You need to make sure your port 80 is free & allowed to be used by NodeRED. You can either:
