@@ -1,3 +1,37 @@
+## THIS NODE IS NO LONGER WORKING
+## TL;DR;
+Please replace my node with [node-red-contrib-amazon-echo]
+
+**Detailed explainations:**
+• My nodes is no longer working with any Alexa devices after recent Alexa firmware (auto) updates.
+• The reason is discovery procedure needs to be hosted on port 80 of your NodeRed.
+• Newer generation of Alexa devices are not working with my node for the same reason.
+• I recommend switching over to this node node-red-contrib-amazon-echo. It is basically a clone of my node, with a separate Node for discovery, running on port 80 by default.
+
+**VERY IMPORTANT NOTE:**
+• You probably need to restart the system after replacing my nodes to clear them from the system.
+• You need to make sure your port 80 is free & allowed to be used by NodeRED. You can either:
+• Run NodeRED as root user, which allow you to open any port on the system.
+OR
+• Use iptables to redirect xxxxx port to 80. Instructions are available here.
+
+This hassle is exactly why I have designed my node to run on random ports, pretty newbie-proof for most users & did not change the implementation for newer generation of Alexa devices.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # node-red-contrib-alexa-local
 
 ![Usage screenshot](https://raw.githubusercontent.com/originallyus/node-red-contrib-alexa-local/master/screenshot2.png "Screenshot")
